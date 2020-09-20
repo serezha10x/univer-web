@@ -1,20 +1,19 @@
 <?php
 
-namespace frontend\modules\teacher\controllers;
+namespace frontend\modules\document\controllers;
 
-use frontend\modules\teacher\models\TeacherIndicator;
+use frontend\modules\document\models\UploadDocumentForm;
 use Yii;
-use frontend\modules\teacher\models\Teacher;
-use frontend\modules\teacher\models\TeacherSearch;
-use yii\filters\AccessControl;
+use frontend\modules\document\models\Document;
+use frontend\modules\document\models\DocumentSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
- * TeacherController implements the CRUD actions for Teacher model.
+ * DocumentController implements the CRUD actions for Document model.
  */
-class TeacherController extends Controller
+class DocumentController extends Controller
 {
     /**
      * {@inheritdoc}
@@ -28,33 +27,16 @@ class TeacherController extends Controller
                     'delete' => ['POST'],
                 ],
             ],
-            'access' => [
-                'class' => AccessControl::className(),
-                'only' => ['create', 'update', 'delete', 'update-indications'],
-                'rules' => [
-                    [
-                        'allow' => true,
-                        'actions' => ['create', 'update', 'delete'],
-                        'roles' => ['@'],
-                    ],
-                    [
-                        'allow' => true,
-                        'actions' => ['view', 'update-indications'],
-                        'roles' => ['?'],
-                    ],
-                ],
-            ],
         ];
     }
 
-
     /**
-     * Lists all Teacher models.
+     * Lists all Document models.
      * @return mixed
      */
     public function actionIndex()
     {
-        $searchModel = new TeacherSearch();
+        $searchModel = new DocumentSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
         return $this->render('index', [
@@ -64,7 +46,7 @@ class TeacherController extends Controller
     }
 
     /**
-     * Displays a single Teacher model.
+     * Displays a single Document model.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
@@ -77,25 +59,28 @@ class TeacherController extends Controller
     }
 
     /**
-     * Creates a new Teacher model.
+     * Creates a new Document model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
      */
     public function actionCreate()
     {
-        $model = new Teacher();
+        $model = new UploadDocumentForm();
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if (Yii::$app->request->isPost) {
+            $model->document = UploadDocumentForm::getInstances($model, 'document');
+            if ($model->upload()) {
+                // file is uploaded successfully
+                Yii::$app->session->setFlash('uploadDocument', 'Документ успешно загружен');
+                return true;
+            }
         }
 
-        return $this->render('create', [
-            'model' => $model,
-        ]);
+        return $this->render('create', ['model' => $model]);
     }
 
     /**
-     * Updates an existing Teacher model.
+     * Updates an existing Document model.
      * If update is successful, the browser will be redirected to the 'view' page.
      * @param integer $id
      * @return mixed
@@ -115,13 +100,11 @@ class TeacherController extends Controller
     }
 
     /**
-     * Deletes an existing Teacher model.
+     * Deletes an existing Document model.
      * If deletion is successful, the browser will be redirected to the 'index' page.
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
-     * @throws \Throwable
-     * @throws \yii\db\StaleObjectException
      */
     public function actionDelete($id)
     {
@@ -131,38 +114,18 @@ class TeacherController extends Controller
     }
 
     /**
-     * Finds the Teacher model based on its primary key value.
+     * Finds the Document model based on its primary key value.
      * If the model is not found, a 404 HTTP exception will be thrown.
      * @param integer $id
-     * @return Teacher the loaded model
+     * @return Document the loaded model
      * @throws NotFoundHttpException if the model cannot be found
      */
     protected function findModel($id)
     {
-        if (($model = Teacher::findOne($id)) !== null) {
+        if (($model = Document::findOne($id)) !== null) {
             return $model;
         }
 
         throw new NotFoundHttpException('The requested page does not exist.');
-    }
-
-    public function actionUpdateIndications($id)
-    {
-        $model = $this->findModel($id);
-        $info_sites = [Teacher::GOOGLE_SCHOLAR, Teacher::SCIENCE_INDEX];
-        $info = [];
-        foreach ($info_sites as $info_site) {
-            $info[] = $model->getIndications($info_site);
-            $model->createOrUpdateIndications($info_site);
-        }
-        //$teacher = new Teacher();
-        //echo '<pre>';var_dump($info);
-
-        $searchModel = new TeacherSearch();
-        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
-
-        return $this->render('view', [
-            'model' => $model
-        ]);
     }
 }

@@ -6,7 +6,7 @@ namespace frontend\modules\teacher\models;
 use frontend\models\util\CurlUtil;
 use frontend\models\util\PHPQueryParser;
 
-class GoogleScholar implements IArticlesParseble
+class GoogleScholarParser implements IArticlesParseble
 {
     protected $tags = [
         'name' => '#gsc_prf_in',

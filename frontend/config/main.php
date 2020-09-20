@@ -16,6 +16,10 @@ return [
             'class' => 'frontend\modules\teacher\Teacher',
             //'layout' => 'new',
         ],
+        'document' => [
+            'class' => 'frontend\modules\document\Document',
+            //'layout' => 'new',
+        ],
     ],
     'components' => [
         'request' => [

@@ -1,16 +1,16 @@
 <?php
 
-namespace frontend\modules\article;
+namespace frontend\modules\document;
 
 /**
- * article module definition class
+ * document module definition class
  */
-class Article extends \yii\base\Module
+class Document extends \yii\base\Module
 {
     /**
      * {@inheritdoc}
      */
-    public $controllerNamespace = 'frontend\modules\article\controllers';
+    public $controllerNamespace = 'frontend\modules\document\controllers';
 
     /**
      * {@inheritdoc}

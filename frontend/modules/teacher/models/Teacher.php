@@ -28,6 +28,8 @@ use Yii;
 class Teacher extends \yii\db\ActiveRecord
 {
     const GOOGLE_SCHOLAR = 101;
+    const SCIENCE_INDEX = 102;
+    const SCIVERSE_SCOPUS = 103;
 
     /**
      * {@inheritdoc}
@@ -105,14 +107,58 @@ class Teacher extends \yii\db\ActiveRecord
         return $this->hasOne(TeacherIndicator::className(), ['id' => 'sciverse_scopus_id']);
     }
 
-    public function getIndications(Teacher $model, int $service)
+    public function getIndications(int $service)
     {
         switch ($service)
         {
             case self::GOOGLE_SCHOLAR:
-                $url = $model->google_scholar;
-                $parser = new GoogleScholar();
+                $url = $this->google_scholar;
+                $parser = new GoogleScholarParser();
                 return $parser->getInfo($url);
+            case self::SCIENCE_INDEX:
+
+
+            default:
+                ;
+        }
+    }
+
+    public function createOrUpdateIndications(int $service)
+    {
+        $teacher_indicator = null;
+        switch ($service)
+        {
+            case self::GOOGLE_SCHOLAR:
+                $url = $this->google_scholar;
+                $parser = new GoogleScholarParser();
+                $info = $parser->getInfo($url);
+                if ($this->google_scholar_id === null) {
+                    $teacher_indicator = new TeacherIndicator();
+                } else {
+                    $teacher_indicator = $this->googleScholar;
+                }
+                $teacher_indicator->num_citations = (int)$info['counts'][0]; // all citations
+                $teacher_indicator->index_hirsha = (int)$info['counts'][2]; // index hirsha
+                $teacher_indicator->save();
+                $this->google_scholar_id = $teacher_indicator->id;
+                $this->save();
+                break;
+            case self::SCIENCE_INDEX:
+                $url = $this->science_index;
+                $parser = new ELibraryParser();
+                $info = $parser->getInfo($url);
+                if ($this->science_index_id === null) {
+                    $teacher_indicator = new TeacherIndicator();
+                } else {
+                    $teacher_indicator = $this->scienceIndex;
+                }
+                $teacher_indicator->num_publication = (int)$info['counts_at_elibrary'][0];
+                $teacher_indicator->num_citations = (int)$info['num_citations'][0]; // all citations
+                $teacher_indicator->index_hirsha = (int)$info['hirsh_index'][0]; // index hirsha
+                $teacher_indicator->save();
+                $this->science_index_id = $teacher_indicator->id;
+                $this->save();
+                break;
             default:
                 ;
         }

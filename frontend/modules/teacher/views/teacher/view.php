@@ -6,9 +6,10 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model frontend\modules\teacher\models\Teacher */
 
-$this->title = $model->name;
+$fullname = "$model->surname $model->name $model->fathername";
+$this->title = $fullname;
 $this->params['breadcrumbs'][] = ['label' => 'Teachers', 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+$this->params['breadcrumbs'][] = $fullname;
 \yii\web\YiiAsset::register($this);
 ?>
 <div class="teacher-view">
@@ -18,10 +19,10 @@ $this->params['breadcrumbs'][] = $this->title;
     <p>
         <?= Html::a('Обновить показатели', ['update-indications', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
         <?= Html::a('Изменить', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
-        <?= Html::a('Delete', ['delete', 'id' => $model->id], [
+        <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
             'data' => [
-                'confirm' => 'Are you sure you want to delete this item?',
+                'confirm' => 'Вы точно хотите удалить запись?',
                 'method' => 'post',
             ],
         ]) ?>
@@ -36,13 +37,37 @@ $this->params['breadcrumbs'][] = $this->title;
             'surname',
             'position:ntext',
             'google_scholar:ntext',
-            'google_scholar_id',
-            'science_index:ntext',
-            'science_index_id',
-            'spin_code:ntext',
-            'sciverse_scopus:ntext',
-            'sciverse_scopus_id',
-            'scopus_author_id:ntext',
+            [
+                'attribute'=>'Количество публикаций на Google Scholar',
+                'value'=>$model->googleScholar->num_publication,
+            ],
+            [
+                'attribute'=>'Количество цитирований на Google Scholar',
+                'value'=>$model->googleScholar->num_citations,
+            ],
+            [
+                'attribute'=>'Индекс Хирша на Google Scholar',
+                'value'=>$model->googleScholar->index_hirsha,
+            ],
+
+            [
+                'attribute'=>'Количество публикаций на ELibrary',
+                'value'=>$model->scienceIndex->num_publication,
+            ],
+            [
+                'attribute'=>'Количество цитирований на ELibrary ',
+                'value'=>$model->scienceIndex->num_citations,
+            ],
+            [
+                'attribute'=>'Индекс Хирша на Google ELibrary',
+                'value'=>$model->scienceIndex->index_hirsha,
+            ],
+//            'science_index:ntext',
+//            'science_index_id',
+//            'spin_code:ntext',
+//            'sciverse_scopus:ntext',
+//            'sciverse_scopus_id',
+//            'scopus_author_id:ntext',
         ],
     ]) ?>
 

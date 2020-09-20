@@ -17,6 +17,12 @@ class CurlUtil
             'X-NewRelic-ID'=>"VQUFVVRACQEEUlAS",
             'X-Requested-With'=>"XMLHttpRequest"
         ));
+        $postData = array(
+            'login' => 'serezha10x',
+            'password' => 'kanatush1234',
+        );
+        curl_setopt($ch, CURLOPT_POST, true);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, $postData);
         curl_setopt($ch, CURLOPT_COOKIEJAR, 'cookies.txt');
         curl_setopt($ch, CURLOPT_COOKIEFILE, 'cookies.txt');
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
