@@ -11,21 +11,21 @@ class m200920_140754_document extends Migration
     {
         $this->createTable('document', [
             'id' => $this->primaryKey(),
-            'teacher_id' => $this->integer(),
+//            'teacher_id' => $this->integer(),
             'document_name' => $this->string(),
             'document_type_id' => $this->integer(),
             'file_name_before' => $this->string(),
             'file_name_after' => $this->string(),
         ]);
 
-        $this->addForeignKey(
-            'fk-document-teacher_id',
-            'document',
-            'teacher_id',
-            'teacher',
-            'id',
-            'NO ACTION'
-        );
+//        $this->addForeignKey(
+//            'fk-document-teacher_id',
+//            'document',
+//            'teacher_id',
+//            'teacher',
+//            'id',
+//            'NO ACTION'
+//        );
 
         $this->addForeignKey(
             'fk-document-document_type_id',
@@ -42,10 +42,10 @@ class m200920_140754_document extends Migration
      */
     public function safeDown()
     {
-        $this->dropForeignKey(
-            'fk-document-teacher_id',
-            'document'
-        );
+//        $this->dropForeignKey(
+//            'fk-document-teacher_id',
+//            'document'
+//        );
 
         $this->dropForeignKey(
             'fk-document-document_type_id',
