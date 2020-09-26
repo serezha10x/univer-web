@@ -65,7 +65,7 @@ class DocumentController extends Controller
      */
     public function actionCreate()
     {
-        $model = new UploadDocumentForm();
+        $model = new uploaddocumentform();
 
         if (Yii::$app->request->isPost) {
             $model->document = UploadDocumentForm::getInstances($model, 'document');
