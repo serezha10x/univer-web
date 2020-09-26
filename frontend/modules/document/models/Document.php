@@ -2,22 +2,19 @@
 
 namespace frontend\modules\document\models;
 
-use frontend\modules\literature\Literature;
-use frontend\modules\teacher\models\Teacher;
 use Yii;
 
 /**
  * This is the model class for table "document".
  *
  * @property int $id
- * @property int|null $teacher_id
  * @property string|null $document_name
  * @property int|null $document_type_id
  * @property string|null $file_name_before
  * @property string|null $file_name_after
  *
  * @property DocumentType $documentType
- * @property Teacher $teacher
+ * @property DocumentTeacher[] $documentTeachers
  * @property Keyword[] $keywords
  * @property Literature[] $literatures
  */
@@ -37,10 +34,9 @@ class Document extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['teacher_id', 'document_type_id'], 'integer'],
+            [['document_type_id'], 'integer'],
             [['document_name', 'file_name_before', 'file_name_after'], 'string', 'max' => 255],
             [['document_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => DocumentType::className(), 'targetAttribute' => ['document_type_id' => 'id']],
-            [['teacher_id'], 'exist', 'skipOnError' => true, 'targetClass' => Teacher::className(), 'targetAttribute' => ['teacher_id' => 'id']],
         ];
     }
 
@@ -51,7 +47,6 @@ class Document extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'teacher_id' => 'Teacher ID',
             'document_name' => 'Document Name',
             'document_type_id' => 'Document Type ID',
             'file_name_before' => 'File Name Before',
@@ -70,13 +65,13 @@ class Document extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Teacher]].
+     * Gets query for [[DocumentTeachers]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getTeacher()
+    public function getDocumentTeachers()
     {
-        return $this->hasOne(Teacher::className(), ['id' => 'teacher_id']);
+        return $this->hasMany(DocumentTeacher::className(), ['document_id' => 'id']);
     }
 
     /**

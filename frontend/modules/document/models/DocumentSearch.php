@@ -17,7 +17,7 @@ class DocumentSearch extends Document
     public function rules()
     {
         return [
-            [['id', 'teacher_id', 'document_type_id'], 'integer'],
+            [['id', 'document_type_id'], 'integer'],
             [['document_name', 'file_name_before', 'file_name_after'], 'safe'],
         ];
     }
@@ -59,7 +59,6 @@ class DocumentSearch extends Document
         // grid filtering conditions
         $query->andFilterWhere([
             'id' => $this->id,
-            'teacher_id' => $this->teacher_id,
             'document_type_id' => $this->document_type_id,
         ]);
 
