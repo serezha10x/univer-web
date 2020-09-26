@@ -13,7 +13,7 @@ use yii\widgets\ActiveForm;
     <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
     <div class="form-group">
-        <?= $form->field($model, 'document')->fileInput() ?>
+        <?= $form->field($model, 'upload_document')->fileInput() ?>
     </div>
 
     <div class="form-group">

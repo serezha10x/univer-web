@@ -9,6 +9,7 @@ use frontend\modules\document\models\DocumentSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 /**
  * DocumentController implements the CRUD actions for Document model.
@@ -69,6 +70,22 @@ class DocumentController extends Controller
 
         if (Yii::$app->request->isPost) {
             $model->document = UploadDocumentForm::getInstances($model, 'document');
+            if ($model->upload()) {
+                // file is uploaded successfully
+                Yii::$app->session->setFlash('uploadDocument', 'Документ успешно загружен');
+                return true;
+            }
+        }
+
+        return $this->render('create', ['model' => $model]);
+    }
+
+    public function actionUpload()
+    {
+        $model = new UploadDocumentForm();
+
+        if (Yii::$app->request->isPost) {
+            $model->upload_document = UploadedFile::getInstance($model, 'upload_document');
             if ($model->upload()) {
                 // file is uploaded successfully
                 Yii::$app->session->setFlash('uploadDocument', 'Документ успешно загружен');

@@ -1,17 +1,15 @@
 <?php
 
 
-namespace App\Reader;
+namespace frontend\modules\document\services\reader;
 
 
-
-use App\Util\FileVerification;
 use Exception;
 
 
 class ReaderCreator
 {
-    public function factory($file_ext): IReader
+    public static function factory($file_ext): IReader
     {
         try {
             if (isset($filename) && !file_exists($filename)) {
@@ -19,16 +17,16 @@ class ReaderCreator
             }
 
             if (!FileVerification::CheckFormat($file_ext)) {
-                throw new Exception('This format ('.$file_ext.') is not supported...');
+                throw new Exception('This format (' . $file_ext . ') is not supported...');
             }
 
-            $reader_class = 'App\Reader\\' . ucfirst($file_ext) . 'Reader';
+            $reader_class = '@frontend\modules\document\services\reader\\' . ucfirst($file_ext) . 'Reader';
             if (class_exists($reader_class)) {
                 return new $reader_class;
             } else {
                 throw new Exception("There is no such a file reader...");
             }
-        } catch(Exception $e) {
+        } catch (Exception $e) {
             exit($e->getMessage());
         }
     }

@@ -1,7 +1,7 @@
 <?php
 
 
-namespace App\Reader;
+namespace frontend\modules\document\services\reader;
 
 
 class RtfReader implements IReader
