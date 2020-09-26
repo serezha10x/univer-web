@@ -20,7 +20,7 @@ class ReaderCreator
                 throw new Exception('This format (' . $file_ext . ') is not supported...');
             }
 
-            $reader_class = '@frontend\modules\document\services\reader\\' . ucfirst($file_ext) . 'Reader';
+            $reader_class = 'frontend\modules\document\services\reader\\' . ucfirst($file_ext) . 'Reader';
             if (class_exists($reader_class)) {
                 return new $reader_class;
             } else {

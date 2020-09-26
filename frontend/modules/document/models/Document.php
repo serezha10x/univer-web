@@ -2,6 +2,8 @@
 
 namespace frontend\modules\document\models;
 
+use frontend\modules\document\services\reader\ReaderCreator;
+use frontend\modules\literature\Literature;
 use Yii;
 
 /**
@@ -92,5 +94,19 @@ class Document extends \yii\db\ActiveRecord
     public function getLiteratures()
     {
         return $this->hasMany(Literature::className(), ['document_id' => 'id']);
+    }
+
+
+    public function read(string $filename): string
+    {
+        $extension = substr($filename, strripos($filename, '.') + 1);
+        $reader = ReaderCreator::factory($extension);
+        var_dump($filename);
+        return $reader->read($filename);
+    }
+
+    public function parse(string $text)
+    {
+
     }
 }

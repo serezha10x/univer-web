@@ -6,15 +6,19 @@ namespace frontend\modules\document\services\reader;
 
 class DocxReader implements IReader
 {
-
-
-    public function read(string $filename): string
+    public function read(string $filename, string $filepath = null): string
     {
         $striped_content = '';
         $content = '';
+        if ($filepath === null) {
+            $zip = zip_open($_SERVER['DOCUMENT_ROOT']. "/documents/" . $filename);
+        } else {
+            $zip = zip_open($filepath . '/' . $filename);
+        }
 
-        $zip = zip_open($filename);
-        if (!$zip || is_numeric($zip)) return false;
+        if (!$zip || is_numeric($zip)) {
+            throw new \Exception('File cannot be opened');
+        }
 
         while ($zip_entry = zip_read($zip)) {
             if (zip_entry_open($zip, $zip_entry) == FALSE) continue;
