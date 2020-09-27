@@ -1,10 +1,8 @@
 <?php
 
 
-namespace App\Parser;
-require_once(base_path() . "/vendor/autoload.php");
+namespace frontend\modules\document\services\parser;
 
-use App\Util\MorphyConfig;
 use phpMorphy;
 use phpMorphy_Exception;
 
@@ -26,7 +24,9 @@ final class ParserFrequency extends ParserBase
     public function parse()
     {
         try {
-            $this->morphy = MorphyConfig::setMorphy('RU_ru');
+            $dir = $_SERVER['DOCUMENT_ROOT'] . "/vendor/cijic/phpmorphy/libs/phpmorphy/dicts";
+            $lang = 'ru_RU';
+            $this->morphy = new phpMorphy($dir, $lang);
         } catch(phpMorphy_Exception $e) {
             die('Error occured while creating phpMorphy instance: ' . $e->getMessage());
         }
@@ -35,7 +35,7 @@ final class ParserFrequency extends ParserBase
 
         $count = count($arr_words);
         // получаем части речи, необходимые для парсинга
-        $need_words = require __DIR__ . "/parser_config/need_part_speech.php";
+        $need_words = require __DIR__ . "/config/need_part_speech.php";
 
         $array_defis = array();
 
@@ -131,7 +131,7 @@ final class ParserFrequency extends ParserBase
             }
         }
 
-        $stop_words = require(base_path() . '/App/Parser/parser_config/stop_words.php');
+        $stop_words = require(__DIR__ . '/config/stop_words.php');
         foreach ($stop_words as $word) {
             $this->key_words = array_diff($this->key_words, array($word));
         }
@@ -142,7 +142,7 @@ final class ParserFrequency extends ParserBase
             if ($i != count($this->key_words) - 1) $dict_parse_text .= $this->key_words[$i] . ", ";
             else $dict_parse_text .= $this->key_words[$i] . ".";
         }
-        return $dict_parse_text;
+        return $this->key_words;
     }
 
 

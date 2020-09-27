@@ -12,7 +12,7 @@ class DocumentService
         $teachers = DocumentTeacher::find()->where(['document_id' => $id])->with('teacher')->all();
         foreach ($teachers as $teacher) {
             $teachers_by_doc .= ($teacher->teacher['surname'] . ' '
-                . $teacher->teacher['name'] . ' ' . $teacher->teacher['fathername'] . ', ');
+                . $teacher->teacher['name'] . ' ' . $teacher->teacher['fathername'] . ', <br/>');
         }
         return rtrim($teachers_by_doc, ', ');
     }

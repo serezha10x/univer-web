@@ -49,10 +49,10 @@ class Document extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'document_name' => 'Document Name',
+            'document_name' => 'Название документа',
             'document_type_id' => 'Document Type ID',
             'file_name_before' => 'File Name Before',
-            'file_name_after' => 'File Name After',
+            'file_name_after' => 'Название файла',
         ];
     }
 
@@ -107,5 +107,16 @@ class Document extends \yii\db\ActiveRecord
     public function parse(string $text)
     {
 
+    }
+
+    public function addKeyWords(array $keyWords)
+    {
+        foreach ($keyWords as $keyWord) {
+            $keyword = new Keyword();
+            $keyword->document_id = $this->id;
+            $keyword->key = 'Часто встречаемые';
+            $keyword->value = $keyWord;
+            $keyword->save();
+        }
     }
 }

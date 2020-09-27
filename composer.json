@@ -21,7 +21,8 @@
         "ext-curl": "*",
         "jaeger/phpquery-single": "^1.0",
       "ext-zip": "*",
-        "kartik-v/yii2-widget-select2": "@dev"
+        "kartik-v/yii2-widget-select2": "@dev",
+        "cijic/phpmorphy": "^0.3.1"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

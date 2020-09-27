@@ -26,6 +26,16 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <div class="form-group">
             <?= Select2::widget([
+                'model' => $document,
+                'name' => 'document_type_id',
+                'value' => '',
+                'data' => $types,
+                'options' => ['multiple' => false, 'placeholder' => 'Тип документа']
+            ]);?>
+        </div>
+
+        <div class="form-group">
+            <?= Select2::widget([
                 'name' => 'teachers[]',
                 'value' => '',
                 'data' => $teachers,

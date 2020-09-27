@@ -5,8 +5,11 @@ namespace frontend\modules\document\controllers;
 use frontend\modules\document\models\Document;
 use frontend\modules\document\models\DocumentSearch;
 use frontend\modules\document\models\DocumentTeacher;
+use frontend\modules\document\models\DocumentType;
+use frontend\modules\document\models\Keyword;
 use frontend\modules\document\models\UploadDocumentForm;
 use frontend\modules\document\services\DocumentService;
+use frontend\modules\document\services\parser\ParserFrequency;
 use frontend\modules\document\services\parser\ParserRegex;
 use frontend\modules\teacher\models\Teacher;
 use Yii;
@@ -62,7 +65,8 @@ class DocumentController extends Controller
     {
         return $this->render('view', [
             'model' => $this->findModel($id),
-            'teachers_by_doc' => DocumentService::getTeacherByDocTeacher($id)
+            'teachers_by_doc' => DocumentService::getTeacherByDocTeacher($id),
+
         ]);
     }
 
@@ -115,10 +119,11 @@ class DocumentController extends Controller
                 // file is uploaded successfully
                 $text = $document->read($document->file_name_after);
                 $parsers['parse_regex'] = new ParserRegex($text);
+                $parsers['parser_freq'] = new ParserFrequency($text);
 
                 $parser_answer = [];
                 foreach ($parsers as $key => $value) {
-                    $parsed_data = $value->parse();
+                    $parsed_data[$key] = $value->parse();
                     if (is_array($parsed_data)) {
                         foreach ($parsed_data as $key_data => $value_data) {
                             $parser_answer[$key_data] = $value_data;
@@ -127,6 +132,8 @@ class DocumentController extends Controller
                         $parser_answer[$key] = $value->parse();
                     }
                 }
+                $document->addKeyWords($parsed_data['parser_freq']);
+                //var_dump($parser_answer); exit();
 
                 Yii::$app->session->setFlash('uploadDocument', 'Документ успешно загружен');
                 $this->redirect(Url::toRoute(['document-edit', 'id' => $document->id]));
@@ -143,6 +150,7 @@ class DocumentController extends Controller
             $teachers_id = $request->post('teachers');
             $document = $this->findModel($id);
             $document->load($request->post());
+            $document->document_type_id = $request->post('document_type_id');
             $document->save();
 
             foreach ($teachers_id as $teacher_id) {
@@ -154,10 +162,18 @@ class DocumentController extends Controller
 
             return $this->redirect(['view', 'id' => $id]);
         } else {
+            $teachers = [];
             $document = Document::findOne($id);
-            $teachers = ArrayHelper::map(Teacher::find()->all(), 'id', 'name');
+//            foreach(Teacher::find()->all() as $teacher) {
+//                $teachers[] = [$teacher->id => $teacher->surname . $teacher->name];
+//            }
+//            var_dump($teachers);
+            $teachers = ArrayHelper::map(Teacher::find()->all(), 'id','surname');
+            $types = ArrayHelper::map(DocumentType::find()->all(), 'id','type');
+
+//            echo '<br>';var_dump($teachers); exit();
             return $this->render('edit-after-load-document', [
-                'teachers' => $teachers, 'document' => $document]);
+                'teachers' => $teachers, 'document' => $document, 'types' => $types]);
         }
     }
 
@@ -192,6 +208,14 @@ class DocumentController extends Controller
      */
     public function actionDelete($id)
     {
+        $documentTeacher = DocumentTeacher::find()->where(['document_id' => $id])->all();
+        $keywords = Keyword::find()->where(['document_id' => $id])->all();
+        foreach ($documentTeacher as $item) {
+            $item->delete();
+        }
+        foreach ($keywords as $keyword) {
+            $keyword->delete();
+        }
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);

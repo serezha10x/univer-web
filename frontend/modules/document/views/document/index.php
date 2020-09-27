@@ -1,5 +1,6 @@
 <?php
 
+use frontend\modules\document\models\DocumentType;
 use frontend\modules\document\services\DocumentService;
 use yii\helpers\Html;
 use yii\grid\GridView;
@@ -10,7 +11,17 @@ use yii\grid\GridView;
 
 $this->title = 'Documents';
 $this->params['breadcrumbs'][] = $this->title;
+
 ?>
+<style>
+    .grid-view td {
+        white-space: nowrap;
+    }
+
+    .grid-view td .wrap {
+        white-space: pre-wrap;
+    }
+</style>
 <div class="document-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
@@ -26,19 +37,22 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-            'id',
             'document_name',
             [
+                'format' => 'html',
                 'attribute' => 'Преподаватели',
-                'class' => 'yii\grid\DataColumn', // может быть опущено, поскольку является значением по умолчанию
-                'value' => function($data) {
+                'value' => function ($data) {
                     return DocumentService::getTeacherByDocTeacher($data->id);
                 }
             ],
             'document_name',
-            'document_type_id',
-            'file_name',
-
+            [
+                'attribute' => 'Тип документа',
+                'value' => function ($data) {
+                    return DocumentType::findOne(['id' => $data->document_type_id])->type;
+                }
+            ],
+            'file_name_after',
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>

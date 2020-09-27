@@ -35,6 +35,17 @@ $this->params['breadcrumbs'][] = $this->title;
                 'attribute' => 'Преподаватели',
                 'value' => $teachers_by_doc,
             ],
+            [
+                'attribute' => 'Ключевые слова',
+                'value' => function ($data) {
+                    $keywords_str = '';
+                    foreach ($data->keywords as $keyword) {
+                        $keywords_str .= ($keyword->value . ', ');
+                    }
+                    $keywords_str = rtrim($keywords_str, ', ');
+                    return $keywords_str;
+                },
+            ],
         ],
     ]) ?>
 
