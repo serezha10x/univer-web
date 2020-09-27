@@ -101,7 +101,6 @@ class Document extends \yii\db\ActiveRecord
     {
         $extension = substr($filename, strripos($filename, '.') + 1);
         $reader = ReaderCreator::factory($extension);
-        var_dump($filename);
         return $reader->read($filename);
     }
 

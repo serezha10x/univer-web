@@ -4,10 +4,15 @@ namespace frontend\modules\document\controllers;
 
 use frontend\modules\document\models\Document;
 use frontend\modules\document\models\DocumentSearch;
+use frontend\modules\document\models\DocumentTeacher;
 use frontend\modules\document\models\UploadDocumentForm;
+use frontend\modules\document\services\DocumentService;
 use frontend\modules\document\services\parser\ParserRegex;
+use frontend\modules\teacher\models\Teacher;
 use Yii;
 use yii\filters\VerbFilter;
+use yii\helpers\ArrayHelper;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\web\UploadedFile;
@@ -57,6 +62,7 @@ class DocumentController extends Controller
     {
         return $this->render('view', [
             'model' => $this->findModel($id),
+            'teachers_by_doc' => DocumentService::getTeacherByDocTeacher($id)
         ]);
     }
 
@@ -80,6 +86,7 @@ class DocumentController extends Controller
      * Creates a new Document model.
      * If creation is successful, the browser will be redirected to the 'view' page.
      * @return mixed
+     * @throws \yii\base\Exception
      */
     public function actionCreate()
     {
@@ -120,16 +127,38 @@ class DocumentController extends Controller
                         $parser_answer[$key] = $value->parse();
                     }
                 }
-                var_dump($parser_answer);
-                echo ($text);
-                exit();
 
                 Yii::$app->session->setFlash('uploadDocument', 'Документ успешно загружен');
-                return true;
+                $this->redirect(Url::toRoute(['document-edit', 'id' => $document->id]));
             }
         }
 
         return $this->render('create', ['model' => $model]);
+    }
+
+    public function actionDocumentEdit($id)
+    {
+        $request = Yii::$app->request;
+        if ($request->isPost) {
+            $teachers_id = $request->post('teachers');
+            $document = $this->findModel($id);
+            $document->load($request->post());
+            $document->save();
+
+            foreach ($teachers_id as $teacher_id) {
+                $documentTeacher = new DocumentTeacher();
+                $documentTeacher->teacher_id = $teacher_id;
+                $documentTeacher->document_id = $id;
+                $documentTeacher->save();
+            }
+
+            return $this->redirect(['view', 'id' => $id]);
+        } else {
+            $document = Document::findOne($id);
+            $teachers = ArrayHelper::map(Teacher::find()->all(), 'id', 'name');
+            return $this->render('edit-after-load-document', [
+                'teachers' => $teachers, 'document' => $document]);
+        }
     }
 
     /**
@@ -158,6 +187,8 @@ class DocumentController extends Controller
      * @param integer $id
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
+     * @throws \Throwable
+     * @throws \yii\db\StaleObjectException
      */
     public function actionDelete($id)
     {

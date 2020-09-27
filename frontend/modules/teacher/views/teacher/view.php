@@ -38,29 +38,29 @@ $this->params['breadcrumbs'][] = $fullname;
             'position:ntext',
             'google_scholar:ntext',
             [
-                'attribute'=>'Количество публикаций на Google Scholar',
-                'value'=>$model->googleScholar->num_publication,
+                'attribute' => 'Количество публикаций на Google Scholar',
+                'value' => $model->googleScholar->num_publication,
             ],
             [
-                'attribute'=>'Количество цитирований на Google Scholar',
-                'value'=>$model->googleScholar->num_citations,
+                'attribute' => 'Количество цитирований на Google Scholar',
+                'value' => $model->googleScholar->num_citations,
             ],
             [
-                'attribute'=>'Индекс Хирша на Google Scholar',
-                'value'=>$model->googleScholar->index_hirsha,
+                'attribute' => 'Индекс Хирша на Google Scholar',
+                'value' => $model->googleScholar->index_hirsha,
             ],
 
             [
-                'attribute'=>'Количество публикаций на ELibrary',
-                'value'=>$model->scienceIndex->num_publication,
+                'attribute' => 'Количество публикаций на ELibrary',
+                'value' => $model->scienceIndex->num_publication,
             ],
             [
-                'attribute'=>'Количество цитирований на ELibrary ',
-                'value'=>$model->scienceIndex->num_citations,
+                'attribute' => 'Количество цитирований на ELibrary ',
+                'value' => $model->scienceIndex->num_citations,
             ],
             [
-                'attribute'=>'Индекс Хирша на Google ELibrary',
-                'value'=>$model->scienceIndex->index_hirsha,
+                'attribute' => 'Индекс Хирша на Google ELibrary',
+                'value' => $model->scienceIndex->index_hirsha,
             ],
 //            'science_index:ntext',
 //            'science_index_id',

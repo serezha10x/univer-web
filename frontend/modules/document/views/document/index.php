@@ -1,5 +1,6 @@
 <?php
 
+use frontend\modules\document\services\DocumentService;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -25,9 +26,15 @@ $this->params['breadcrumbs'][] = $this->title;
         'filterModel' => $searchModel,
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
-
             'id',
-            'teacher_id',
+            'document_name',
+            [
+                'attribute' => 'Преподаватели',
+                'class' => 'yii\grid\DataColumn', // может быть опущено, поскольку является значением по умолчанию
+                'value' => function($data) {
+                    return DocumentService::getTeacherByDocTeacher($data->id);
+                }
+            ],
             'document_name',
             'document_type_id',
             'file_name',

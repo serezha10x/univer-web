@@ -6,7 +6,7 @@ use yii\widgets\DetailView;
 /* @var $this yii\web\View */
 /* @var $model frontend\modules\document\models\Document */
 
-$this->title = $model->id;
+$this->title = $model->document_name;
 $this->params['breadcrumbs'][] = ['label' => 'Documents', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
@@ -30,10 +30,11 @@ $this->params['breadcrumbs'][] = $this->title;
         'model' => $model,
         'attributes' => [
             'id',
-            'teacher_id',
             'document_name',
-            'document_type_id',
-            'file_name',
+            [
+                'attribute' => 'Преподаватели',
+                'value' => $teachers_by_doc,
+            ],
         ],
     ]) ?>
 
