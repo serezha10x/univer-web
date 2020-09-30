@@ -9,6 +9,7 @@ use yii\widgets\ActiveForm;
 
 $this->title = 'Редактиовать документ';
 $this->params['breadcrumbs'][] = ['label' => 'Документ', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Загрузка документа', 'url' => ['upload']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="document-edit">

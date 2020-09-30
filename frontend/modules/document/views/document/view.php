@@ -29,9 +29,9 @@ $this->params['breadcrumbs'][] = $this->title;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'id',
             'document_name',
             [
+                'format' => 'html',
                 'attribute' => 'Преподаватели',
                 'value' => $teachers_by_doc,
             ],

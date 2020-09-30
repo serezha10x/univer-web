@@ -13,6 +13,7 @@ use frontend\modules\document\services\parser\ParserFrequency;
 use frontend\modules\document\services\parser\ParserRegex;
 use frontend\modules\teacher\models\Teacher;
 use Yii;
+use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
@@ -35,6 +36,23 @@ class DocumentController extends Controller
                 'class' => VerbFilter::className(),
                 'actions' => [
                     'delete' => ['POST'],
+                ],
+            ],
+            'access' => [
+                'class' => AccessControl::className(),
+                'only' => ['create', 'update', 'delete', 'update-indications'],
+                'rules' => [
+                    [
+                        'allow' => true,
+                        //'actions' => ['create', 'update', 'delete'],
+                        'actions' => ['delete'],
+                        'roles' => ['@'],
+                    ],
+                    [
+                        'allow' => true,
+                        'actions' => ['create', 'update', 'view', 'update-indications'],
+                        'roles' => ['?'],
+                    ],
                 ],
             ],
         ];
