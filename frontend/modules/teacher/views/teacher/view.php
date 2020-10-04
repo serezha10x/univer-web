@@ -8,7 +8,7 @@ use yii\widgets\DetailView;
 
 $fullname = "$model->surname $model->name $model->fathername";
 $this->title = $fullname;
-$this->params['breadcrumbs'][] = ['label' => 'Teachers', 'url' => ['index']];
+$this->params['breadcrumbs'][] = ['label' => 'Преподаватель', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $fullname;
 \yii\web\YiiAsset::register($this);
 ?>
@@ -18,6 +18,8 @@ $this->params['breadcrumbs'][] = $fullname;
 
     <p>
         <?= Html::a('Обновить показатели', ['update-indications', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Поиск статей в сети', ['show-docs-web', 'id' => $model->id], ['class' => 'btn btn-info']) ?>
+        <?= Html::a('Поиск статей в хранилище', ['update-indications', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
         <?= Html::a('Изменить', ['update', 'id' => $model->id], ['class' => 'btn btn-primary']) ?>
         <?= Html::a('Удалить', ['delete', 'id' => $model->id], [
             'class' => 'btn btn-danger',
@@ -31,12 +33,12 @@ $this->params['breadcrumbs'][] = $fullname;
     <?= DetailView::widget([
         'model' => $model,
         'attributes' => [
-            'id',
             'name',
             'fathername',
             'surname',
             'position:ntext',
             'google_scholar:ntext',
+            'science_index',
             [
                 'attribute' => 'Количество публикаций на Google Scholar',
                 'value' => $model->googleScholar->num_publication,

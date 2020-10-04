@@ -2,10 +2,14 @@
 
 namespace frontend\modules\teacher\controllers;
 
+use common\exceptions\NotFoundTeacherException;
 use frontend\modules\teacher\models\TeacherIndicator;
+use frontend\modules\teacher\services\DocsFinderWeb;
 use Yii;
 use frontend\modules\teacher\models\Teacher;
 use frontend\modules\teacher\models\TeacherSearch;
+use yii\data\ActiveDataProvider;
+use yii\data\ArrayDataProvider;
 use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -165,4 +169,36 @@ class TeacherController extends Controller
             'model' => $model
         ]);
     }
+
+    public function actionShowDocsWeb($id)
+    {
+        if (!Teacher::isIssetTeacher($id)) {
+            throw new NotFoundTeacherException();
+        }
+        $teacher = Teacher::findOne(['id' => $id]);
+
+        $docsFinder = new DocsFinderWeb();
+        $docs = $docsFinder->getDocs($teacher);
+
+//        echo '<pre>';var_dump($docs); exit();
+        $dataProvider = new ArrayDataProvider ([
+            'allModels' => $docs,
+//            'pagination' => [
+//                'pageSize' => 20,
+//            ],
+        ]);
+
+        return $this->render('show-docs', [
+            'dataProvider' => $dataProvider,
+            'docs' => $docs,
+            'teacher' => $teacher
+        ]);
+    }
+
+
+    public function actionDownloadDocWeb()
+    {
+
+    }
+
 }

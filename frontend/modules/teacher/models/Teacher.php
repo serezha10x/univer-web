@@ -2,6 +2,7 @@
 
 namespace frontend\modules\teacher\models;
 
+use common\exceptions\NotFoundTeacherException;
 use Yii;
 
 /**
@@ -62,10 +63,10 @@ class Teacher extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'Name',
-            'fathername' => 'Fathername',
-            'surname' => 'Surname',
-            'position' => 'Position',
+            'name' => 'Имя',
+            'fathername' => 'Отчество',
+            'surname' => 'Фамилия',
+            'position' => 'Должность',
             'google_scholar' => 'Google Scholar',
             'google_scholar_id' => 'Google Scholar ID',
             'science_index' => 'Science Index',
@@ -163,4 +164,14 @@ class Teacher extends \yii\db\ActiveRecord
                 ;
         }
     }
+
+    public static function isIssetTeacher(int $id): bool
+    {
+        $teacher = Teacher::findOne(['id' => $id]);
+        if ($teacher === null) {
+            return false;
+        }
+        return true;
+    }
+
 }

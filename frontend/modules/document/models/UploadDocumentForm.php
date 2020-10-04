@@ -35,7 +35,7 @@ class UploadDocumentForm extends Model
             $document->file_name_after = (Yii::$app
                     ->getSecurity()
                     ->generateRandomString(self::NUM_CHARS_FILE_NAME)) . '.' . $this->upload_document->extension;
-            $document->file_name_after = $document->file_name_before;
+            //$document->file_name_after = $document->file_name_before;
             $document->save();
             if ($document->id === null) {
                 throw new Exception('Document was not save!');

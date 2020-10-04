@@ -52,7 +52,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     return DocumentType::findOne(['id' => $data->document_type_id])->type;
                 }
             ],
-            'file_name_after',
+            'file_name_before',
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>

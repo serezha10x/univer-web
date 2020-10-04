@@ -6,7 +6,7 @@
 // Copyright 2009
 
 // Чтобы работать с doc, мы дожны уметь работать с WCBFF не так ли?
-namespace App\Reader;
+namespace frontend\modules\document\services\reader\base;
 
 
 // Класс для работы с Microsoft Word Document (в народе doc), расширяет

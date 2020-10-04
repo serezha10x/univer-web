@@ -101,7 +101,7 @@ class Document extends \yii\db\ActiveRecord
     {
         $extension = substr($filename, strripos($filename, '.') + 1);
         $reader = ReaderCreator::factory($extension);
-        return $reader->read($filename);
+        return $reader->read($filename, Yii::$app->params['docs.path']);
     }
 
     public function parse(string $text)

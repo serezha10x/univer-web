@@ -4,13 +4,15 @@
 namespace frontend\modules\document\services\reader;
 
 
+use frontend\modules\document\services\reader\base\Doc;
+
 class DocReader implements IReader
 {
 
-    public function read(string $filename): string
+    public function read(string $filename, string $filepath): string
     {
         $doc = new Doc();
-        $doc->read($filename);
+        $doc->read("$filepath/$filename");
         $text = $doc->parse();
         $text = strip_tags($text);
         return mb_convert_encoding($text, "UTF-8", "auto");

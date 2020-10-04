@@ -3,8 +3,8 @@
 namespace frontend\modules\teacher\models;
 
 
-use frontend\models\util\CurlUtil;
-use frontend\models\util\PHPQueryParser;
+use common\services\CurlService;
+use common\services\PHPQueryParser;
 
 class GoogleScholarParser implements IArticlesParseble
 {
@@ -17,7 +17,7 @@ class GoogleScholarParser implements IArticlesParseble
 
     public function getInfo(string $url)
     {
-        $my_curl = new CurlUtil();
+        $my_curl = new CurlService();
         $q_parser = new PHPQueryParser();
         return $q_parser->ParseArray($my_curl->getPageText($url), $this->tags);
     }
