@@ -3,10 +3,12 @@
 namespace frontend\modules\document\controllers;
 
 use frontend\modules\document\models\Document;
+use frontend\modules\document\models\DocumentProperty;
 use frontend\modules\document\models\DocumentSearch;
 use frontend\modules\document\models\DocumentTeacher;
 use frontend\modules\document\models\DocumentType;
 use frontend\modules\document\models\Keyword;
+use frontend\modules\document\models\Property;
 use frontend\modules\document\models\UploadDocumentForm;
 use frontend\modules\document\services\DocumentService;
 use frontend\modules\document\services\parser\ParserFrequency;
@@ -150,7 +152,12 @@ class DocumentController extends Controller
                         $parser_answer[$key] = $value->parse();
                     }
                 }
-                $document->addKeyWords($parsed_data['parser_freq']);
+
+                //var_dump($parsed_data['parser_freq']); exit();
+                $document->addDocumentProperty(
+                    Property::getIdByProperty(Property::KEY_WORDS),
+                    $parsed_data['parser_freq']
+                );
                 //var_dump($parser_answer); exit();
 
                 Yii::$app->session->setFlash('uploadDocument', 'Документ успешно загружен');
@@ -188,10 +195,20 @@ class DocumentController extends Controller
 //            var_dump($teachers);
             $teachers = ArrayHelper::map(Teacher::find()->all(), 'id','surname');
             $types = ArrayHelper::map(DocumentType::find()->all(), 'id','type');
+            $keywords = ArrayHelper::map(DocumentProperty::find()->
+                       where([
+                           'document_id' => $id,
+                           'property_id' => Property::getIdByProperty(Property::KEY_WORDS)
+            ])->all(),
+                'id','value');
 
 //            echo '<br>';var_dump($teachers); exit();
             return $this->render('edit-after-load-document', [
-                'teachers' => $teachers, 'document' => $document, 'types' => $types]);
+                'teachers' => $teachers,
+                'document' => $document,
+                'types' => $types,
+                'keywords' => $keywords
+            ]);
         }
     }
 

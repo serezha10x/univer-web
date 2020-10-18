@@ -119,4 +119,15 @@ class Document extends \yii\db\ActiveRecord
             $keyword->save();
         }
     }
+
+    public function addDocumentProperty(int $propertyId, array $properties)
+    {
+        foreach ($properties as $property) {
+            $keyword = new DocumentProperty();
+            $keyword->document_id = $this->id;
+            $keyword->property_id = $propertyId;
+            $keyword->value = $property;
+            $keyword->save();
+        }
+    }
 }

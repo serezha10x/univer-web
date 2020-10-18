@@ -45,6 +45,15 @@ $this->params['breadcrumbs'][] = $this->title;
         </div>
 
         <div class="form-group">
+            <?= Select2::widget([
+                'name' => 'keywords[]',
+                'value' => '',
+                'data' => $keywords,
+                'options' => ['multiple' => true, 'placeholder' => 'Ключевые слова']
+            ]);?>
+        </div>
+
+        <div class="form-group">
             <?= Html::submitButton('Редактировать документ', ['class' => 'btn btn-success']) ?>
         </div>
 
