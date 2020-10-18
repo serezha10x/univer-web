@@ -11,6 +11,7 @@ use frontend\modules\document\models\Keyword;
 use frontend\modules\document\models\Property;
 use frontend\modules\document\models\UploadDocumentForm;
 use frontend\modules\document\services\DocumentService;
+use frontend\modules\document\services\parser\ParserFio;
 use frontend\modules\document\services\parser\ParserFrequency;
 use frontend\modules\document\services\parser\ParserRegex;
 use frontend\modules\teacher\models\Teacher;
@@ -138,26 +139,18 @@ class DocumentController extends Controller
             if ($document !== null) {
                 // file is uploaded successfully
                 $text = $document->read($document->file_name_after);
-                $parsers['parse_regex'] = new ParserRegex($text);
-                $parsers['parser_freq'] = new ParserFrequency($text);
+                $parsers[Property::FIO] = new ParserFio($text);
+                $parsers[Property::KEY_WORDS] = new ParserFrequency($text);
 
-                $parser_answer = [];
-                foreach ($parsers as $key => $value) {
-                    $parsed_data[$key] = $value->parse();
-                    if (is_array($parsed_data)) {
-                        foreach ($parsed_data as $key_data => $value_data) {
-                            $parser_answer[$key_data] = $value_data;
-                        }
-                    } else {
-                        $parser_answer[$key] = $value->parse();
-                    }
+                foreach ($parsers as $key => $parser) {
+                    $parser_answer = $parser->parse();
+                    $document->addDocumentProperty(
+                        Property::getIdByProperty($key),
+                        $parser_answer
+                    );
                 }
 
                 //var_dump($parsed_data['parser_freq']); exit();
-                $document->addDocumentProperty(
-                    Property::getIdByProperty(Property::KEY_WORDS),
-                    $parsed_data['parser_freq']
-                );
                 //var_dump($parser_answer); exit();
 
                 Yii::$app->session->setFlash('uploadDocument', 'Документ успешно загружен');
@@ -195,20 +188,24 @@ class DocumentController extends Controller
 //            var_dump($teachers);
             $teachers = ArrayHelper::map(Teacher::find()->all(), 'id','surname');
             $types = ArrayHelper::map(DocumentType::find()->all(), 'id','type');
-            $keywords = ArrayHelper::map(DocumentProperty::find()->
-                       where([
-                           'document_id' => $id,
-                           'property_id' => Property::getIdByProperty(Property::KEY_WORDS)
-            ])->all(),
-                'id','value');
 
-//            echo '<br>';var_dump($teachers); exit();
-            return $this->render('edit-after-load-document', [
+            $properties = [
+                'keywords' => Property::KEY_WORDS,
+                'fios' => Property::FIO
+            ];
+            $propertiesValue = [];
+            foreach ($properties as $key => $property) {
+                $propertiesValue += [$key => ArrayHelper::map(DocumentProperty::find()->where([
+                    'document_id' => $id,
+                    'property_id' => Property::getIdByProperty($property)
+                ])->all(),'id','value')];
+            }
+
+            return $this->render('edit-after-load-document', array_merge([
                 'teachers' => $teachers,
                 'document' => $document,
                 'types' => $types,
-                'keywords' => $keywords
-            ]);
+            ], $propertiesValue));
         }
     }
 

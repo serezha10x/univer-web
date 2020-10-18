@@ -48,8 +48,20 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= Select2::widget([
                 'name' => 'keywords[]',
                 'value' => '',
-                'data' => $keywords,
+                'data' => array_keys($keywords),
                 'options' => ['multiple' => true, 'placeholder' => 'Ключевые слова']
+            ]);?>
+        </div>
+        <div class="form-group">
+            <?= Select2::widget([
+                'name' => 'fios[]',
+                'value' => array_keys($fios),
+                'data' => $fios,
+                'maintainOrder' => true,
+                'options' => ['multiple' => true, 'placeholder' => 'ФИО'],
+                'pluginOptions' => [
+                    'tags' => true,
+                ],
             ]);?>
         </div>
 

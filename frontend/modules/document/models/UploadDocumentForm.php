@@ -31,6 +31,7 @@ class UploadDocumentForm extends Model
     {
         if ($this->validate()) {
             $document = new Document();
+            $document->document_name = $this->upload_document->baseName;
             $document->file_name_before = $this->upload_document->baseName . '.' . $this->upload_document->extension;
             $document->file_name_after = (Yii::$app
                     ->getSecurity()
