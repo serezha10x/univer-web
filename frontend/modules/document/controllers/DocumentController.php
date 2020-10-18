@@ -176,11 +176,13 @@ class DocumentController extends Controller
             $document->document_type_id = $request->post('document_type_id');
             $document->save();
 
-            foreach ($teachers_id as $teacher_id) {
-                $documentTeacher = new DocumentTeacher();
-                $documentTeacher->teacher_id = $teacher_id;
-                $documentTeacher->document_id = $id;
-                $documentTeacher->save();
+            if ($teachers_id != null) {
+                foreach ($teachers_id as $teacher_id) {
+                    $documentTeacher = new DocumentTeacher();
+                    $documentTeacher->teacher_id = $teacher_id;
+                    $documentTeacher->document_id = $id;
+                    $documentTeacher->save();
+                }
             }
 
             return $this->redirect(['view', 'id' => $id]);
