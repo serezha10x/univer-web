@@ -1,5 +1,8 @@
 <?php
 
+use common\helpers\ViewHelper;
+use frontend\modules\document\models\DocumentProperty;
+use frontend\modules\document\models\Property;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
@@ -38,12 +41,29 @@ $this->params['breadcrumbs'][] = $this->title;
             [
                 'attribute' => 'Ключевые слова',
                 'value' => function ($data) {
-                    $keywords_str = '';
-                    foreach ($data->keywords as $keyword) {
-                        $keywords_str .= ($keyword->value . ', ');
-                    }
-                    $keywords_str = rtrim($keywords_str, ', ');
-                    return $keywords_str;
+                    $keywords = DocumentProperty::getValuesByProperty($data->id, Property::KEY_WORDS);
+                    return ViewHelper::formDataToDetailView($keywords);
+                },
+            ],
+            [
+                'attribute' => 'ФИО',
+                'value' => function ($data) {
+                    $keywords = DocumentProperty::getValuesByProperty($data->id, Property::FIO);
+                    return ViewHelper::formDataToDetailView($keywords);
+                },
+            ],
+            [
+                'attribute' => 'Emails',
+                'value' => function ($data) {
+                    $keywords = DocumentProperty::getValuesByProperty($data->id, Property::EMAIL);
+                    return ViewHelper::formDataToDetailView($keywords);
+                },
+            ],
+            [
+                'attribute' => 'Даты',
+                'value' => function ($data) {
+                    $keywords = DocumentProperty::getValuesByProperty($data->id, Property::DATES);
+                    return ViewHelper::formDataToDetailView($keywords);
                 },
             ],
         ],

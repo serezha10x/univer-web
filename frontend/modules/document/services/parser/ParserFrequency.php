@@ -78,6 +78,7 @@ final class ParserFrequency extends ParserBase
                                         continue;
                                     }
                                 }
+                                $s = $this->morphy->lemmatize($s)[0];
                                 $count++;
                                 array_push($arr_words, $s);
                                 $temp_array[] = $s;

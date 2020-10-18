@@ -11,9 +11,12 @@ use frontend\modules\document\models\Keyword;
 use frontend\modules\document\models\Property;
 use frontend\modules\document\models\UploadDocumentForm;
 use frontend\modules\document\services\DocumentService;
+use frontend\modules\document\services\parser\ParserDates;
+use frontend\modules\document\services\parser\ParserEmails;
 use frontend\modules\document\services\parser\ParserFio;
 use frontend\modules\document\services\parser\ParserFrequency;
 use frontend\modules\document\services\parser\ParserRegex;
+use frontend\modules\document\services\parser\ParserTeachers;
 use frontend\modules\teacher\models\Teacher;
 use Yii;
 use yii\filters\AccessControl;
@@ -87,7 +90,6 @@ class DocumentController extends Controller
         return $this->render('view', [
             'model' => $this->findModel($id),
             'teachers_by_doc' => DocumentService::getTeacherByDocTeacher($id),
-
         ]);
     }
 
@@ -139,8 +141,11 @@ class DocumentController extends Controller
             if ($document !== null) {
                 // file is uploaded successfully
                 $text = $document->read($document->file_name_after);
-                $parsers[Property::FIO] = new ParserFio($text);
                 $parsers[Property::KEY_WORDS] = new ParserFrequency($text);
+                $parsers[Property::FIO] = new ParserFio($text);
+                $parsers[Property::EMAIL] = new ParserEmails($text);
+                $parsers[Property::DATES] = new ParserDates($text);
+                $parsers[Property::TEACHER] = new ParserTeachers($text);
 
                 foreach ($parsers as $key => $parser) {
                     $parser_answer = $parser->parse();
@@ -191,7 +196,10 @@ class DocumentController extends Controller
 
             $properties = [
                 'keywords' => Property::KEY_WORDS,
-                'fios' => Property::FIO
+                'fios' => Property::FIO,
+                'emails' => Property::EMAIL,
+                'dates' => Property::DATES,
+                'foundTeachers' => Property::TEACHER
             ];
             $propertiesValue = [];
             foreach ($properties as $key => $property) {
@@ -200,7 +208,8 @@ class DocumentController extends Controller
                     'property_id' => Property::getIdByProperty($property)
                 ])->all(),'id','value')];
             }
-
+//            var_dump($propertiesValue['foundTeachers']); exit();
+//var_dump($propertiesValue['keywords']); exit();
             return $this->render('edit-after-load-document', array_merge([
                 'teachers' => $teachers,
                 'document' => $document,

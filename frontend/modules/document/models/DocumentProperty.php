@@ -70,4 +70,11 @@ class DocumentProperty extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Property::className(), ['id' => 'property_id']);
     }
+
+    public static function getValuesByProperty(int $documentId, string $property)
+    {
+        return DocumentProperty::find()->where([
+            'document_id' => $documentId,
+            'property_id' => Property::getIdByProperty($property)])->all();
+    }
 }

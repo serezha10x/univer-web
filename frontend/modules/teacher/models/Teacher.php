@@ -174,4 +174,14 @@ class Teacher extends \yii\db\ActiveRecord
         return true;
     }
 
+    public static function getTeachersIdsBySurname(array $surnames): array
+    {
+        $ids = [];
+        foreach ($surnames as $surname) {
+            $ids[] = Teacher::findOne(['surname' => $surname])->id;
+        }
+
+        return $ids;
+    }
+
 }

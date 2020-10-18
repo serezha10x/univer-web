@@ -1,5 +1,6 @@
 <?php
 
+use frontend\modules\teacher\models\Teacher;
 use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -35,23 +36,29 @@ $this->params['breadcrumbs'][] = $this->title;
             ]);?>
         </div>
 
+        <label>Преподаватели</label>
         <div class="form-group">
+<!--            --><?php //var_dump($foundTeachers); exit(); ?>
             <?= Select2::widget([
                 'name' => 'teachers[]',
-                'value' => '',
+                'value' => Teacher::getTeachersIdsBySurname($foundTeachers),
                 'data' => $teachers,
                 'options' => ['multiple' => true, 'placeholder' => 'Преподаватели']
             ]);?>
         </div>
 
+        <label>Ключевые слова</label>
         <div class="form-group">
             <?= Select2::widget([
                 'name' => 'keywords[]',
-                'value' => '',
-                'data' => array_keys($keywords),
+                'value' => array_keys($keywords),
+                'data' => $keywords,
+                'maintainOrder' => true,
                 'options' => ['multiple' => true, 'placeholder' => 'Ключевые слова']
             ]);?>
         </div>
+
+        <label>ФИО</label>
         <div class="form-group">
             <?= Select2::widget([
                 'name' => 'fios[]',
@@ -59,9 +66,28 @@ $this->params['breadcrumbs'][] = $this->title;
                 'data' => $fios,
                 'maintainOrder' => true,
                 'options' => ['multiple' => true, 'placeholder' => 'ФИО'],
-                'pluginOptions' => [
-                    'tags' => true,
-                ],
+            ]);?>
+        </div>
+
+        <label>Элестронные адреса</label>
+        <div class="form-group">
+            <?= Select2::widget([
+                'name' => 'emails[]',
+                'value' => array_keys($emails),
+                'data' => $emails,
+                'maintainOrder' => true,
+                'options' => ['multiple' => true, 'placeholder' => 'Emails'],
+            ]);?>
+        </div>
+
+        <label>Даты</label>
+        <div class="form-group">
+            <?= Select2::widget([
+                'name' => 'dates[]',
+                'value' => array_keys($dates),
+                'data' => $dates,
+                'maintainOrder' => true,
+                'options' => ['multiple' => true, 'placeholder' => 'Даты'],
             ]);?>
         </div>
 

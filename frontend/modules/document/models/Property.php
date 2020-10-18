@@ -3,6 +3,7 @@
 namespace frontend\modules\document\models;
 
 use Yii;
+use yii\db\Exception;
 
 /**
  * This is the model class for table "property".
@@ -16,8 +17,11 @@ class Property extends \yii\db\ActiveRecord
 {
     const KEY_WORDS = 'Ключевые слова';
     const UDK = 'Удк';
+    const EMAIL = 'Email';
+    const DATES = 'Даты';
     const LITERATURE = 'Литература';
     const FIO = 'ФИО';
+    const TEACHER = 'Преподаватели';
 
 
     /**
@@ -66,6 +70,11 @@ class Property extends \yii\db\ActiveRecord
 
     public static function getIdByProperty(string $property)
     {
-        return Property::findOne(['property' => $property])->id;
+        $id = Property::findOne(['property' => $property])->id;
+        if ($id === null) {
+            throw new Exception('There are no such property!');
+        }
+        return $id;
     }
+
 }
