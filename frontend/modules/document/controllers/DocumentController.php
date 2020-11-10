@@ -10,12 +10,13 @@ use frontend\modules\document\models\DocumentType;
 use frontend\modules\document\models\Keyword;
 use frontend\modules\document\models\Property;
 use frontend\modules\document\models\UploadDocumentForm;
+use frontend\modules\document\models\UploadWebDocumentForm;
 use frontend\modules\document\services\DocumentService;
+use frontend\modules\document\services\finder\GoogleScholarFinder;
 use frontend\modules\document\services\parser\ParserDates;
 use frontend\modules\document\services\parser\ParserEmails;
 use frontend\modules\document\services\parser\ParserFio;
 use frontend\modules\document\services\parser\ParserFrequency;
-use frontend\modules\document\services\parser\ParserRegex;
 use frontend\modules\document\services\parser\ParserTeachers;
 use frontend\modules\teacher\models\Teacher;
 use Yii;
@@ -131,7 +132,7 @@ class DocumentController extends Controller
         return $this->render('create', ['model' => $model]);
     }
 
-    public function actionUpload()
+    public function actionUploadLocal()
     {
         $model = new UploadDocumentForm();
 
@@ -166,6 +167,21 @@ class DocumentController extends Controller
         return $this->render('create', ['model' => $model]);
     }
 
+//    public function actionUploadWeb()
+//    {
+//        $request = Yii::$app->request;
+//        $uploadForm = new UploadWebDocumentForm();
+//
+//        if ($request->isPost && $uploadForm->load(Yii::$app->request->post())) {
+//            $finder = new GoogleScholarFinder();
+//            $finder->findDocuments($uploadForm);
+//
+//            return $this->render('show-upload-web-document', ['uploadForm' => $uploadForm]);
+//        }
+//
+//        return $this->render('upload-web-form', ['model' => new UploadWebDocumentForm()]);
+//    }
+
     public function actionDocumentEdit($id)
     {
         $request = Yii::$app->request;
@@ -193,8 +209,8 @@ class DocumentController extends Controller
 //                $teachers[] = [$teacher->id => $teacher->surname . $teacher->name];
 //            }
 //            var_dump($teachers);
-            $teachers = ArrayHelper::map(Teacher::find()->all(), 'id','surname');
-            $types = ArrayHelper::map(DocumentType::find()->all(), 'id','type');
+            $teachers = ArrayHelper::map(Teacher::find()->all(), 'id', 'surname');
+            $types = ArrayHelper::map(DocumentType::find()->all(), 'id', 'type');
 
             $properties = [
                 'keywords' => Property::KEY_WORDS,
@@ -208,7 +224,7 @@ class DocumentController extends Controller
                 $propertiesValue += [$key => ArrayHelper::map(DocumentProperty::find()->where([
                     'document_id' => $id,
                     'property_id' => Property::getIdByProperty($property)
-                ])->all(),'id','value')];
+                ])->all(), 'id', 'value')];
             }
 //            var_dump($propertiesValue['foundTeachers']); exit();
 //var_dump($propertiesValue['keywords']); exit();

@@ -14,6 +14,7 @@ use Yii;
  * @property int|null $document_type_id
  * @property string|null $file_name_before
  * @property string|null $file_name_after
+ * @property string|null $doc_source
  *
  * @property DocumentType $documentType
  * @property DocumentTeacher[] $documentTeachers

@@ -24,7 +24,8 @@
         "kartik-v/yii2-widget-select2": "@dev",
         "cijic/phpmorphy": "^0.3.1",
         "components/font-awesome": "^5.15",
-        "smalot/pdfparser": "^0.15.1"
+        "smalot/pdfparser": "^0.15.1",
+        "monolog/monolog": "^2.1"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",
