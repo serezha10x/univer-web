@@ -23,6 +23,8 @@ use Yii;
  */
 class Document extends \yii\db\ActiveRecord
 {
+    const NUM_CHARS_FILE_NAME = 50;
+
     /**
      * {@inheritdoc}
      */
@@ -54,6 +56,7 @@ class Document extends \yii\db\ActiveRecord
             'document_type_id' => 'Document Type ID',
             'file_name_before' => 'File Name Before',
             'file_name_after' => 'Название файла',
+            'doc_source' => 'Источник файла',
         ];
     }
 
@@ -130,5 +133,10 @@ class Document extends \yii\db\ActiveRecord
             $keyword->value = $property;
             $keyword->save();
         }
+    }
+
+    public static function getFileNameAfter(string $file_ext)
+    {
+        return (Yii::$app->getSecurity()->generateRandomString(self::NUM_CHARS_FILE_NAME)) . '.' . $file_ext;
     }
 }

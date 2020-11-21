@@ -10,9 +10,7 @@ use frontend\modules\document\models\DocumentType;
 use frontend\modules\document\models\Keyword;
 use frontend\modules\document\models\Property;
 use frontend\modules\document\models\UploadDocumentForm;
-use frontend\modules\document\models\UploadWebDocumentForm;
 use frontend\modules\document\services\DocumentService;
-use frontend\modules\document\services\finder\GoogleScholarFinder;
 use frontend\modules\document\services\parser\ParserDates;
 use frontend\modules\document\services\parser\ParserEmails;
 use frontend\modules\document\services\parser\ParserFio;
@@ -49,15 +47,15 @@ class DocumentController extends Controller
                 'class' => AccessControl::className(),
                 'only' => ['create', 'update', 'delete', 'update-indications'],
                 'rules' => [
+//                    [
+//                        'allow' => true,
+//                        //'actions' => ['create', 'update', 'delete'],
+//                        'actions' => ['delete'],
+//                        'roles' => ['@'],
+//                    ],
                     [
                         'allow' => true,
-                        //'actions' => ['create', 'update', 'delete'],
-                        'actions' => ['delete'],
-                        'roles' => ['@'],
-                    ],
-                    [
-                        'allow' => true,
-                        'actions' => ['create', 'update', 'view', 'update-indications'],
+                        'actions' => ['create', 'delete', 'update', 'view', 'update-indications'],
                         'roles' => ['?'],
                     ],
                 ],
@@ -156,33 +154,23 @@ class DocumentController extends Controller
                     );
                 }
 
-                //var_dump($parsed_data['parser_freq']); exit();
-                //var_dump($parser_answer); exit();
-
                 Yii::$app->session->setFlash('uploadDocument', 'Документ успешно загружен');
-                $this->redirect(Url::toRoute(['document-edit', 'id' => $document->id]));
+                $this->redirect(Url::toRoute(['update', 'id' => $document->id]));
             }
         }
 
         return $this->render('create', ['model' => $model]);
     }
 
-//    public function actionUploadWeb()
-//    {
-//        $request = Yii::$app->request;
-//        $uploadForm = new UploadWebDocumentForm();
-//
-//        if ($request->isPost && $uploadForm->load(Yii::$app->request->post())) {
-//            $finder = new GoogleScholarFinder();
-//            $finder->findDocuments($uploadForm);
-//
-//            return $this->render('show-upload-web-document', ['uploadForm' => $uploadForm]);
-//        }
-//
-//        return $this->render('upload-web-form', ['model' => new UploadWebDocumentForm()]);
-//    }
-
-    public function actionDocumentEdit($id)
+    /**
+     * Updates an existing Document model.
+     * If update is successful, the browser will be redirected to the 'view' page.
+     * @param integer $id
+     * @return mixed
+     * @throws NotFoundHttpException if the model cannot be found
+     * @throws \yii\db\Exception
+     */
+    public function actionUpdate($id)
     {
         $request = Yii::$app->request;
         if ($request->isPost) {
@@ -203,12 +191,8 @@ class DocumentController extends Controller
 
             return $this->redirect(['view', 'id' => $id]);
         } else {
-            $teachers = [];
             $document = Document::findOne($id);
-//            foreach(Teacher::find()->all() as $teacher) {
-//                $teachers[] = [$teacher->id => $teacher->surname . $teacher->name];
-//            }
-//            var_dump($teachers);
+
             $teachers = ArrayHelper::map(Teacher::find()->all(), 'id', 'surname');
             $types = ArrayHelper::map(DocumentType::find()->all(), 'id', 'type');
 
@@ -219,6 +203,7 @@ class DocumentController extends Controller
                 'dates' => Property::DATES,
                 'foundTeachers' => Property::TEACHER
             ];
+
             $propertiesValue = [];
             foreach ($properties as $key => $property) {
                 $propertiesValue += [$key => ArrayHelper::map(DocumentProperty::find()->where([
@@ -226,34 +211,13 @@ class DocumentController extends Controller
                     'property_id' => Property::getIdByProperty($property)
                 ])->all(), 'id', 'value')];
             }
-//            var_dump($propertiesValue['foundTeachers']); exit();
-//var_dump($propertiesValue['keywords']); exit();
+
             return $this->render('edit-after-load-document', array_merge([
                 'teachers' => $teachers,
                 'document' => $document,
                 'types' => $types,
             ], $propertiesValue));
         }
-    }
-
-    /**
-     * Updates an existing Document model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param integer $id
-     * @return mixed
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
-        }
-
-        return $this->render('update', [
-            'model' => $model,
-        ]);
     }
 
     /**
@@ -269,12 +233,18 @@ class DocumentController extends Controller
     {
         $documentTeacher = DocumentTeacher::find()->where(['document_id' => $id])->all();
         $keywords = Keyword::find()->where(['document_id' => $id])->all();
+        $properties = DocumentProperty::find()->where(['document_id' => $id])->all();
+
         foreach ($documentTeacher as $item) {
             $item->delete();
         }
         foreach ($keywords as $keyword) {
             $keyword->delete();
         }
+        foreach ($properties as $property) {
+            $property->delete();
+        }
+
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);

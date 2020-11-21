@@ -11,9 +11,10 @@ use frontend\modules\document\models\UploadWebDocumentForm;
 
 class GoogleScholarFinder implements IDocumentFinder
 {
-    const SEARCH_QUERY = 'https://scholar.google.com.ua/scholar?hl=ru&as_ylo=<year_down>&as_yhi=<year_up>&q=<query>';
+    const SEARCH_QUERY = 'https://scholar.google.com.ua/scholar?hl=ru&as_ylo=<year_down>&as_yhi=<year_up>&q=<query>&start=<start>';
+    const ITEMS_ON_PAGE = 10;
 
-    protected static $filtersLink = ['.pdf'];
+    protected static $filtersLink = ['pdf'];
 
     protected static $tags = [
         ['name' => 'name',   'tag' => 'h3',            'attr' => null  ],
@@ -24,14 +25,22 @@ class GoogleScholarFinder implements IDocumentFinder
 
     public function findDocuments(UploadWebDocumentForm $form, int $limit = 10): array
     {
-        $theme = $form->theme;
-        $query = static::SEARCH_QUERY;
-        $query = str_replace('<query>', $theme, $query);
-        $query = str_replace('<year_down>', '2015', $query);
-        $query = str_replace('<year_up>', '2020', $query);
-        $page = (new CurlService())->getPageText($query);
-        $parser = new PHPQueryParser();
-        $parseItems = $parser->parseByItems($page, self::$mainItem, self::$tags);
+        $theme = urlencode($form->theme);
+        $query = self::SEARCH_QUERY;
+        $parseItems = [];
+
+        for ($i = 0; $i < $limit; $i += self::ITEMS_ON_PAGE) {
+            $query = self::SEARCH_QUERY;
+            $query = str_replace('<query>', $theme, $query);
+            $query = str_replace('<year_down>', '2015', $query);
+            $query = str_replace('<year_up>', '2020', $query);
+            $query = str_replace('<start>', (string)$i, $query);
+
+            $page = (new CurlService())->getPageText($query);
+            $parser = new PHPQueryParser();
+            $parseItems = array_merge($parseItems, $parser->parseByItems($page, self::$mainItem, self::$tags));
+        }
+
         $docs = $this->convertToDocuments($parseItems);
         $docs = $this->filterDocuments($docs);
 

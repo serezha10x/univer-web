@@ -52,4 +52,19 @@ class DocumentType extends \yii\db\ActiveRecord
     {
         return $this->hasMany(Document::className(), ['document_type_id' => 'id']);
     }
+
+    public static function getDocumentType(string $type)
+    {
+        foreach (DocumentType::find()->all() as $documentType) {
+            if ($documentType->type === $type) {
+                return $documentType->id;
+            }
+        }
+
+        $newType = new DocumentType();
+        $newType->type = $type;
+        $newType->save();
+
+        return $newType->id;
+    }
 }

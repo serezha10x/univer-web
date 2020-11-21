@@ -12,7 +12,6 @@ use yii\base\Model;
 class UploadDocumentForm extends Model
 {
     const MAX_FILE_SIZE_MB = 10;
-    const NUM_CHARS_FILE_NAME = 50;
     public $upload_document;
 
     public function rules()
@@ -33,10 +32,7 @@ class UploadDocumentForm extends Model
             $document = new Document();
             $document->document_name = $this->upload_document->baseName;
             $document->file_name_before = $this->upload_document->baseName . '.' . $this->upload_document->extension;
-            $document->file_name_after = (Yii::$app
-                    ->getSecurity()
-                    ->generateRandomString(self::NUM_CHARS_FILE_NAME)) . '.' . $this->upload_document->extension;
-            //$document->file_name_after = $document->file_name_before;
+            $document->file_name_after = Document::getFileNameAfter($this->upload_document->extension);
             $document->save();
             if ($document->id === null) {
                 throw new Exception('Document was not save!');

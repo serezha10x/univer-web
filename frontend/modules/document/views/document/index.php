@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Загрузить документ локально', ['upload-local'], ['class' => 'btn btn-success']) ?>
-        <?= Html::a('Загрузить документ с сети', ['upload-web'], ['class' => 'btn btn-warning']) ?>
+        <?= Html::a('Загрузить документ с сети', '/document/document-upload/upload-web', ['class' => 'btn btn-warning']) ?>
     </p>
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
@@ -46,17 +46,15 @@ $this->params['breadcrumbs'][] = $this->title;
                     return DocumentService::getTeacherByDocTeacher($data->id);
                 }
             ],
-            'document_name',
             [
                 'attribute' => 'Тип документа',
                 'value' => function ($data) {
                     return DocumentType::findOne(['id' => $data->document_type_id])->type;
                 }
             ],
-            'file_name_before',
+            'doc_source',
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>
-
 
 </div>

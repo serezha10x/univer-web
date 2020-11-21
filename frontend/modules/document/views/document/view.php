@@ -66,6 +66,7 @@ $this->params['breadcrumbs'][] = $this->title;
                     return ViewHelper::formDataToDetailView($keywords);
                 },
             ],
+            'doc_source'
         ],
     ]) ?>
 

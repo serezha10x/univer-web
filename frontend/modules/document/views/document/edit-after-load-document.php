@@ -13,6 +13,7 @@ $this->params['breadcrumbs'][] = ['label' => 'Документ', 'url' => ['inde
 $this->params['breadcrumbs'][] = ['label' => 'Загрузка документа', 'url' => ['upload']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+
 <div class="document-edit">
     <h1><?= Html::encode($this->title) ?></h1>
 
@@ -38,7 +39,6 @@ $this->params['breadcrumbs'][] = $this->title;
 
         <label>Преподаватели</label>
         <div class="form-group">
-<!--            --><?php //var_dump($foundTeachers); exit(); ?>
             <?= Select2::widget([
                 'name' => 'teachers[]',
                 'value' => Teacher::getTeachersIdsBySurname($foundTeachers),

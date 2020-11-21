@@ -13,6 +13,7 @@ class CurlService
         curl_setopt($ch, CURLOPT_USERAGENT, $useragent);
         curl_setopt($ch, CURLOPT_REFERER, $url);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+            'REMOTE_ADDR' => "127.0.0.1",
             'X-NewRelic-ID' => "VQUFVVRACQEEUlAS",
             'X-Requested-With' => "XMLHttpRequest"
         ));
@@ -30,5 +31,23 @@ class CurlService
 
         curl_close($ch);
         return $html;
+    }
+
+    public function downloadFile($url, $path)
+    {
+        $ch = curl_init($url);
+
+        $fp = fopen($path, 'wb');
+
+        curl_setopt($ch, CURLOPT_FILE, $fp);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 7);
+        curl_setopt($ch, CURLOPT_HEADER, 0);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+
+        curl_exec($ch);
+
+        curl_close($ch);
+
+        fclose($fp);
     }
 }

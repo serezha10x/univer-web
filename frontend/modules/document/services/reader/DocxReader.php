@@ -6,7 +6,7 @@ namespace frontend\modules\document\services\reader;
 
 class DocxReader implements IReader
 {
-    public function read(string $filename, string $filepath = null): string
+    public function read(string $filename, string $filepath, $pages = 5, $typeReading = self::BEGIN_END_PAGES): string
     {
         $striped_content = '';
         $content = '';
