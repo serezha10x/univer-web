@@ -8,9 +8,5 @@ use frontend\modules\document\models\Document;
 
 interface IDocumentUpload
 {
-    public function upload(Document $document);
-
-    public function edit();
-
-    public function save();
+    public function upload(Document $document = null);
 }

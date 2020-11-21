@@ -16,12 +16,17 @@ class DocumentUploadController extends Controller
 {
     public function actionCreate($id)
     {
-        $documentToLoad = Yii::$app->session->get('documentToLoad_' . $id);
-        $uploader = new DocumentWebUpload();
         try {
+            $session = Yii::$app->session;
+            if (!$session->hasProperty('documentToLoad_' . $id)) {
+                throw new \Exception('Can\'t load document');
+            }
+            $documentToLoad = $session->get('documentToLoad_' . $id);
+            $uploader = new DocumentWebUpload();
             $uploader->upload($documentToLoad);
+
             Yii::$app->session->setFlash('uploadDocument', 'Документ успешно загружен');
-            $this->redirect(Url::toRoute(['document-edit', 'id' => $documentToLoad->id]));
+            $this->redirect(Url::toRoute(['/document/document/update', 'id' => $documentToLoad->id]));
         } catch (\Exception $ex) {
 
         }

@@ -4,12 +4,13 @@
 namespace frontend\modules\document\models;
 
 
+use frontend\modules\document\models\upload\IDocumentUpload;
 use Yii;
 use yii\base\Exception;
 use yii\base\Model;
 
 
-class UploadDocumentForm extends Model
+class UploadDocumentForm extends Model implements IDocumentUpload
 {
     const MAX_FILE_SIZE_MB = 10;
     public $upload_document;
@@ -23,10 +24,11 @@ class UploadDocumentForm extends Model
     }
 
     /**
-     * @return Document|null if save was unsuccess
-     * @throws \yii\base\Exception
+     * @param Document|null $document
+     * @return bool|Document
+     * @throws Exception
      */
-    public function upload(): Document
+    public function upload(Document $document = null)
     {
         if ($this->validate()) {
             $document = new Document();
@@ -41,7 +43,7 @@ class UploadDocumentForm extends Model
 
             return $document;
         } else {
-            return null;
+            return false;
         }
     }
 }

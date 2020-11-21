@@ -11,6 +11,7 @@ use frontend\modules\document\models\Keyword;
 use frontend\modules\document\models\Property;
 use frontend\modules\document\models\UploadDocumentForm;
 use frontend\modules\document\services\DocumentService;
+use frontend\modules\document\services\parser\Parser;
 use frontend\modules\document\services\parser\ParserDates;
 use frontend\modules\document\services\parser\ParserEmails;
 use frontend\modules\document\services\parser\ParserFio;
@@ -116,7 +117,7 @@ class DocumentController extends Controller
      */
     public function actionCreate()
     {
-        $model = new uploaddocumentform();
+        $model = new UploadDocumentForm();
 
         if (Yii::$app->request->isPost) {
             $model->document = UploadDocumentForm::getInstances($model, 'document');
@@ -140,19 +141,11 @@ class DocumentController extends Controller
             if ($document !== null) {
                 // file is uploaded successfully
                 $text = $document->read($document->file_name_after);
-                $parsers[Property::KEY_WORDS] = new ParserFrequency($text);
-                $parsers[Property::FIO] = new ParserFio($text);
-                $parsers[Property::EMAIL] = new ParserEmails($text);
-                $parsers[Property::DATES] = new ParserDates($text);
-                $parsers[Property::TEACHER] = new ParserTeachers($text);
 
-                foreach ($parsers as $key => $parser) {
-                    $parser_answer = $parser->parse();
-                    $document->addDocumentProperty(
-                        Property::getIdByProperty($key),
-                        $parser_answer
-                    );
-                }
+                $parser = new Parser($text, [ParserFrequency::class, ParserFio::class, ParserEmails::class,
+                    ParserDates::class, ParserTeachers::class]);
+
+                $parser->parse($document);
 
                 Yii::$app->session->setFlash('uploadDocument', 'Документ успешно загружен');
                 $this->redirect(Url::toRoute(['update', 'id' => $document->id]));

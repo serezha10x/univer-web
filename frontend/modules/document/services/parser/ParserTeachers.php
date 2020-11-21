@@ -6,7 +6,7 @@ namespace frontend\modules\document\services\parser;
 
 use frontend\modules\teacher\models\Teacher;
 
-class ParserTeachers extends ParserBase
+final class ParserTeachers extends ParserBase
 {
     /**
      * ParserDates constructor.

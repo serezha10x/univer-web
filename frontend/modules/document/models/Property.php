@@ -72,7 +72,7 @@ class Property extends \yii\db\ActiveRecord
     {
         $id = Property::findOne(['property' => $property])->id;
         if ($id === null) {
-            throw new Exception('There are no such property!');
+            throw new Exception("There is no $property property!");
         }
         return $id;
     }

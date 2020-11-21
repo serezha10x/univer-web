@@ -16,9 +16,4 @@ class UploadWebDocumentForm extends Model
             [['theme'], 'required'],
         ];
     }
-
-    public function search()
-    {
-
-    }
 }

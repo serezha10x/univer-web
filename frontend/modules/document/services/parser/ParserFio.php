@@ -4,7 +4,7 @@
 namespace frontend\modules\document\services\parser;
 
 
-class ParserFio extends ParserBase
+final class ParserFio extends ParserBase
 {
     const PATTERN = '@([А-Я][а-яё]+\s[А-Я][\.\s]{1,2}[А-Я][,.\s]?)|([А-Я][\.\s]{1,2}[А-Я][\.\s]{1,2}[А-Я][а-яё]+)@u';
 
