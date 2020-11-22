@@ -13,6 +13,7 @@ use Yii;
  */
 class Source extends \yii\db\ActiveRecord
 {
+    const LOCAL_FILE = 'Файл загруженный локально';
     /**
      * {@inheritdoc}
      */

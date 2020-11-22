@@ -3,6 +3,7 @@
 
 namespace frontend\modules\document\controllers;
 
+use common\exceptions\ServiceUnavailable;
 use frontend\modules\document\models\upload\DocumentWebUpload;
 use frontend\modules\document\models\UploadWebDocumentForm;
 use frontend\modules\document\services\finder\GoogleScholarFinder;
@@ -39,8 +40,12 @@ class DocumentUploadController extends Controller
         $uploadForm = new UploadWebDocumentForm();
 
         if ($request->isPost && $uploadForm->load(Yii::$app->request->post())) {
-            $finder = new GoogleScholarFinder();
-            $docs = $finder->findDocuments($uploadForm);
+            try {
+                $finder = new GoogleScholarFinder();
+                $docs = $finder->findDocuments($uploadForm);
+            } catch (ServiceUnavailable $ex) {
+                Yii::$app->session->setFlash('service', $ex->getMessage());
+            }
 
             $dataProvider = new ArrayDataProvider ([
                 'allModels' => $docs,

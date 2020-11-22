@@ -139,4 +139,34 @@ class Document extends \yii\db\ActiveRecord
     {
         return (Yii::$app->getSecurity()->generateRandomString(self::NUM_CHARS_FILE_NAME)) . '.' . $file_ext;
     }
+
+
+    public function updateProperties($newProperties, $property_id)
+    {
+        if ($newProperties === null) {
+            DocumentProperty::deleteAll(['property_id' => $property_id]);
+            return;
+        }
+        $oldProperties = DocumentProperty::find()
+            ->select('id')
+            ->where(['document_id' => $this->id, 'property_id' => $property_id])
+            ->asArray()
+            ->all();
+        foreach ($oldProperties as $oldProperty) {
+            if (!in_array($oldProperty['id'], $newProperties)) {
+                DocumentProperty::deleteAll(['id' => $oldProperty]);
+            }
+        }
+    }
+
+    public function updateTeachers(array $teachersId)
+    {
+        DocumentTeacher::deleteAll(['document_id' => $this->id]);
+        foreach ($teachersId as $teacherId) {
+            $documentTeacher = new DocumentTeacher();
+            $documentTeacher->document_id = $this->id;
+            $documentTeacher->teacher_id = $teacherId;
+            $documentTeacher->save();
+        }
+    }
 }

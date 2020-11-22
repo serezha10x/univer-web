@@ -58,4 +58,10 @@ class Keyword extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Document::className(), ['id' => 'document_id']);
     }
+
+    public static function getKeywordById(int $id)
+    {
+        return Keyword::findOne($id);
+    }
+
 }

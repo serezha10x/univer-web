@@ -4,6 +4,7 @@
 namespace frontend\modules\document\services\finder;
 
 
+use common\exceptions\ServiceUnavailable;
 use common\services\CurlService;
 use common\services\PHPQueryParser;
 use frontend\modules\document\models\Document;
@@ -38,7 +39,11 @@ class GoogleScholarFinder implements IDocumentFinder
 
             $page = (new CurlService())->getPageText($query);
             $parser = new PHPQueryParser();
-            $parseItems = array_merge($parseItems, $parser->parseByItems($page, self::$mainItem, self::$tags));
+            $item = $parser->parseByItems($page, self::$mainItem, self::$tags);
+            if ($item === null) {
+                throw new ServiceUnavailable('Google Scholar is unavailable');
+            }
+            $parseItems = array_merge($parseItems, $item);
         }
 
         $docs = $this->convertToDocuments($parseItems);

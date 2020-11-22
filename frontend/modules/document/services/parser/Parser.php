@@ -33,6 +33,10 @@ class Parser
         return $this;
     }
 
+    /**
+     * @param Document $document
+     * @throws \yii\db\Exception
+     */
     public function parse(Document $document)
     {
         foreach ($this->parsers as $parser) {
@@ -44,6 +48,9 @@ class Parser
         }
     }
 
+    /**
+     * @return array
+     */
     private function getParsers(): array
     {
         return [
@@ -55,6 +62,10 @@ class Parser
         ];
     }
 
+    /**
+     * @param string $class
+     * @return false|int|string
+     */
     private function getParser(string $class)
     {
         return array_search($class, $this->getParsers());

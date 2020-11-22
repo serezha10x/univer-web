@@ -6,7 +6,7 @@ namespace frontend\modules\document\services\parser;
 
 final class ParserDates extends ParserBase
 {
-    const PATTERN = "@([“'\"\s]\d{1,2}[”'\"\s]\s?[а-я]+\s\d{4})|(\d{1,2}[\.]\d{1,2}[\.]\d{4})@u";
+    const PATTERN = "@([“'\"\s]\d{1,2}[”'\"\s]\s?[а-я]+\s\d{4})|(\d{1,2}[\.]\d{1,2}[\.]\d{4})|(\d{4}\s?г\.?)@u";
 
     /**
      * ParserDates constructor.

@@ -167,20 +167,15 @@ class DocumentController extends Controller
     {
         $request = Yii::$app->request;
         if ($request->isPost) {
-            $teachers_id = $request->post('teachers');
             $document = $this->findModel($id);
+            $document->updateProperties($request->post('keywords'), Property::getIdByProperty(Property::KEY_WORDS));
+            $document->updateProperties($request->post('dates'), Property::getIdByProperty(Property::DATES));
+            $document->updateProperties($request->post('fios'), Property::getIdByProperty(Property::FIO));
+            $document->updateProperties($request->post('emails'), Property::getIdByProperty(Property::EMAIL));
+            $document->updateTeachers($request->post('teachers'));
             $document->load($request->post());
             $document->document_type_id = $request->post('document_type_id');
             $document->save();
-
-            if ($teachers_id != null) {
-                foreach ($teachers_id as $teacher_id) {
-                    $documentTeacher = new DocumentTeacher();
-                    $documentTeacher->teacher_id = $teacher_id;
-                    $documentTeacher->document_id = $id;
-                    $documentTeacher->save();
-                }
-            }
 
             return $this->redirect(['view', 'id' => $id]);
         } else {

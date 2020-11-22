@@ -11,6 +11,14 @@ $this->title = 'Доступные для скачивания документ�
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
+
+<?php if( Yii::$app->session->hasFlash('service') ): ?>
+    <div class="alert alert-danger alert-dismissible" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <?php echo Yii::$app->session->getFlash('service'); ?>
+    </div>
+<?php endif;?>
+
 <div class="teacher-index">
 
     <h1><?= Html::encode($this->title) ?></h1>

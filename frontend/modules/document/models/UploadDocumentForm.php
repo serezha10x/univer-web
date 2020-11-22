@@ -34,7 +34,9 @@ class UploadDocumentForm extends Model implements IDocumentUpload
             $document = new Document();
             $document->document_name = $this->upload_document->baseName;
             $document->file_name_before = $this->upload_document->baseName . '.' . $this->upload_document->extension;
-            $document->file_name_after = Document::getFileNameAfter($this->upload_document->extension);
+            $document->file_name_after = Document::getFileNameAfter($this->upload_document->extension);            $document->file_name_after = Document::getFileNameAfter($this->upload_document->extension);
+            $document->doc_source = Source::LOCAL_FILE;
+
             $document->save();
             if ($document->id === null) {
                 throw new Exception('Document was not save!');

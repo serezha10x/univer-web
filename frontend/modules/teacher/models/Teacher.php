@@ -183,5 +183,4 @@ class Teacher extends \yii\db\ActiveRecord
 
         return $ids;
     }
-
 }
