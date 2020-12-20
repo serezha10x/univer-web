@@ -5,7 +5,7 @@ namespace frontend\modules\document\services\reader;
 
 class PdfReader implements IReader
 {
-    public function read(string $filename, string $filepath, $pages = 5, $typeReading = self::BEGIN_END_PAGES): string
+    public function read(string $filename, string $filepath, $pages = 7, $typeReading = self::BEGIN_END_PAGES): string
     {
         $parser = new \Smalot\PdfParser\Parser();
         try {

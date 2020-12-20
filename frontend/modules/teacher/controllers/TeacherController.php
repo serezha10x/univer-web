@@ -3,6 +3,7 @@
 namespace frontend\modules\teacher\controllers;
 
 use common\exceptions\NotFoundTeacherException;
+use frontend\modules\document\services\finder\GoogleScholarPublications;
 use frontend\modules\teacher\models\TeacherIndicator;
 use frontend\modules\teacher\services\DocsFinderWeb;
 use Yii;
@@ -169,6 +170,32 @@ class TeacherController extends Controller
             'model' => $model
         ]);
     }
+//
+//    public function actionShowDocsWeb($id)
+//    {
+//        if (!Teacher::isIssetTeacher($id)) {
+//            throw new NotFoundTeacherException();
+//        }
+//        $teacher = Teacher::findOne(['id' => $id]);
+//
+//        $docsFinder = new DocsFinderWeb();
+//        $docs = $docsFinder->getDocs($teacher);
+//
+////        echo '<pre>';var_dump($docs); exit();
+//        $dataProvider = new ArrayDataProvider ([
+//            'allModels' => $docs,
+////            'pagination' => [
+////                'pageSize' => 20,
+////            ],
+//        ]);
+//
+//        return $this->render('show-docs', [
+//            'dataProvider' => $dataProvider,
+//            'docs' => $docs,
+//            'teacher' => $teacher
+//        ]);
+//    }
+
 
     public function actionShowDocsWeb($id)
     {
@@ -176,29 +203,24 @@ class TeacherController extends Controller
             throw new NotFoundTeacherException();
         }
         $teacher = Teacher::findOne(['id' => $id]);
+//        $googleScholarId = $teacher->
 
-        $docsFinder = new DocsFinderWeb();
-        $docs = $docsFinder->getDocs($teacher);
+        $googleScholarPublications = new GoogleScholarPublications('9aZ3OTcAAAAJ');
+        $publications = $googleScholarPublications->getPublications();
+        $docs = $googleScholarPublications->convertToDocuments($publications);
 
-//        echo '<pre>';var_dump($docs); exit();
         $dataProvider = new ArrayDataProvider ([
             'allModels' => $docs,
-//            'pagination' => [
-//                'pageSize' => 20,
-//            ],
+            'pagination' => [
+                'pageSize' => 30,
+            ],
         ]);
 
-        return $this->render('show-docs', [
+        return $this->render('show-publications', [
             'dataProvider' => $dataProvider,
             'docs' => $docs,
             'teacher' => $teacher
         ]);
-    }
-
-
-    public function actionDownloadDocWeb()
-    {
-
     }
 
 }

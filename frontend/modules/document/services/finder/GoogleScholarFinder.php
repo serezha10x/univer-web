@@ -15,7 +15,7 @@ class GoogleScholarFinder implements IDocumentFinder
     const SEARCH_QUERY = 'https://scholar.google.com.ua/scholar?hl=ru&as_ylo=<year_down>&as_yhi=<year_up>&q=<query>&start=<start>';
     const ITEMS_ON_PAGE = 10;
 
-    protected static $filtersLink = ['pdf'];
+    protected static $filtersLink = ['pdf', 'all'];
 
     protected static $tags = [
         ['name' => 'name',   'tag' => 'h3',            'attr' => null  ],
@@ -24,7 +24,7 @@ class GoogleScholarFinder implements IDocumentFinder
 
     protected static $mainItem = '.gs_r, .gs_or, .gs_scl';
 
-    public function findDocuments(UploadWebDocumentForm $form, int $limit = 10): array
+    public function findDocuments(UploadWebDocumentForm $form, int $limit = 20): array
     {
         $theme = urlencode($form->theme);
         $query = self::SEARCH_QUERY;
@@ -40,6 +40,7 @@ class GoogleScholarFinder implements IDocumentFinder
             $page = (new CurlService())->getPageText($query);
             $parser = new PHPQueryParser();
             $item = $parser->parseByItems($page, self::$mainItem, self::$tags);
+
             if ($item === null) {
                 throw new ServiceUnavailable('Google Scholar is unavailable');
             }
@@ -67,22 +68,26 @@ class GoogleScholarFinder implements IDocumentFinder
 
     public function filterDocuments(array $docs): array
     {
-        $filterDoc = [];
-        foreach ($docs as $doc) {
-            if (strlen($doc->doc_source) > 0 AND strlen($doc->document_name) > 0) {
-                if (self::$filtersLink !== null) {
-                    foreach (self::$filtersLink as $filterLink) {
-                        if (strripos($doc->doc_source, $filterLink) !== false) {
-                            $filterDoc[] = $doc;
-                            continue;
+        if (!in_array('all', self::$filtersLink)) {
+            $filterDoc = [];
+            foreach ($docs as $doc) {
+                if (strlen($doc->doc_source) > 0 AND strlen($doc->document_name) > 0) {
+                    if (self::$filtersLink !== null) {
+                        foreach (self::$filtersLink as $filterLink) {
+                            if (strripos($doc->doc_source, $filterLink) !== false) {
+                                $filterDoc[] = $doc;
+                                continue;
+                            }
                         }
+                    } else {
+                        $filterDoc[] = $doc;
                     }
-                } else {
-                    $filterDoc[] = $doc;
                 }
             }
-        }
 
-        return $filterDoc;
+            return $filterDoc;
+        } else {
+            return $docs;
+        }
     }
 }

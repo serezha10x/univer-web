@@ -27,6 +27,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ?>
         </div>
 
+        <label>Тип документа</label>
         <div class="form-group">
             <?= Select2::widget([
                 'model' => $document,

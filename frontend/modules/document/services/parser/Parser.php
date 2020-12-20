@@ -35,17 +35,22 @@ class Parser
 
     /**
      * @param Document $document
+     * @return array
      * @throws \yii\db\Exception
      */
     public function parse(Document $document)
     {
+        $result = [];
         foreach ($this->parsers as $parser) {
             $parser_answer = (new $parser($this->text))->parse();
             $document->addDocumentProperty(
                 Property::getIdByProperty($this->getParser($parser)),
                 $parser_answer
             );
+            $result[] = $parser_answer;
         }
+
+        return $result;
     }
 
     /**

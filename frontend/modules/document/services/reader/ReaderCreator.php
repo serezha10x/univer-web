@@ -1,8 +1,6 @@
 <?php
 
-
 namespace frontend\modules\document\services\reader;
-
 
 use Exception;
 

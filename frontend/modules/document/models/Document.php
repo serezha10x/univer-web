@@ -15,6 +15,8 @@ use Yii;
  * @property string|null $file_name_before
  * @property string|null $file_name_after
  * @property string|null $doc_source
+ * @property int|null $year
+ * @property string|null $description
  *
  * @property DocumentType $documentType
  * @property DocumentTeacher[] $documentTeachers
@@ -39,8 +41,8 @@ class Document extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['document_type_id'], 'integer'],
-            [['document_name', 'file_name_before', 'file_name_after'], 'string', 'max' => 255],
+            [['document_type_id', 'year'], 'integer'],
+            [['document_name', 'file_name_before', 'file_name_after', 'description'], 'string', 'max' => 255],
             [['document_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => DocumentType::className(), 'targetAttribute' => ['document_type_id' => 'id']],
         ];
     }
@@ -126,6 +128,9 @@ class Document extends \yii\db\ActiveRecord
 
     public function addDocumentProperty(int $propertyId, array $properties)
     {
+        if ($properties === null) {
+            return;
+        }
         foreach ($properties as $property) {
             $keyword = new DocumentProperty();
             $keyword->document_id = $this->id;
@@ -159,9 +164,12 @@ class Document extends \yii\db\ActiveRecord
         }
     }
 
-    public function updateTeachers(array $teachersId)
+    public function updateTeachers($teachersId)
     {
         DocumentTeacher::deleteAll(['document_id' => $this->id]);
+        if ($teachersId === null) {
+            return;
+        }
         foreach ($teachersId as $teacherId) {
             $documentTeacher = new DocumentTeacher();
             $documentTeacher->document_id = $this->id;

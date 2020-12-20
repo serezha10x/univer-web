@@ -2,6 +2,7 @@
 
 namespace frontend\modules\document\controllers;
 
+use frontend\modules\document\handlers\DocumentHandler;
 use frontend\modules\document\models\Document;
 use frontend\modules\document\models\DocumentProperty;
 use frontend\modules\document\models\DocumentSearch;
@@ -70,6 +71,8 @@ class DocumentController extends Controller
      */
     public function actionIndex()
     {
+        $handler = new DocumentHandler(new Document());
+        $handler->handle();
         $searchModel = new DocumentSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -140,12 +143,8 @@ class DocumentController extends Controller
             $document = $model->upload();
             if ($document !== null) {
                 // file is uploaded successfully
-                $text = $document->read($document->file_name_after);
-
-                $parser = new Parser($text, [ParserFrequency::class, ParserFio::class, ParserEmails::class,
-                    ParserDates::class, ParserTeachers::class]);
-
-                $parser->parse($document);
+                $handler = new DocumentHandler($document);
+                $handler->handle();
 
                 Yii::$app->session->setFlash('uploadDocument', 'Документ успешно загружен');
                 $this->redirect(Url::toRoute(['update', 'id' => $document->id]));

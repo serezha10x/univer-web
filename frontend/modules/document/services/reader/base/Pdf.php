@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Reader;
+namespace frontend\modules\document\services\reader\base;
 
 class PDF
 {
