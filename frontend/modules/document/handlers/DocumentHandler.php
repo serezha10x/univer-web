@@ -2,31 +2,24 @@
 
 namespace frontend\modules\document\handlers;
 
-use common\services\semantic\WikiSemantic;
-use common\services\wiki\WikipediaApi;
 use common\services\wordnet\WordNetApi;
 use frontend\modules\document\models\Document;
+use frontend\modules\document\models\DocumentSection;
+use frontend\modules\document\models\DocumentType;
+use frontend\modules\document\models\Property;
 use frontend\modules\document\services\parser\Parser;
-use frontend\modules\document\services\parser\ParserDates;
-use frontend\modules\document\services\parser\ParserEmails;
-use frontend\modules\document\services\parser\ParserFio;
-use frontend\modules\document\services\parser\ParserFrequency;
-use frontend\modules\document\services\parser\ParserTeachers;
+use frontend\modules\document\services\vsm\Vsm;
+use frontend\modules\section\models\Section;
 
 class DocumentHandler
 {
     private $document;
 
+    private $handlers;
     /**
      * @var array
      */
-    private $handlers = [
-        ParserFrequency::class,
-        ParserFio::class,
-        ParserEmails::class,
-        ParserDates::class,
-        ParserTeachers::class
-    ];
+
 
     /**
      * DocumentHandler constructor.
@@ -36,25 +29,43 @@ class DocumentHandler
     public function __construct(Document $document, array $handlers = null)
     {
         $this->document = $document;
-        if ($handlers !== null) {
+        if ($handlers === null) {
+            $this->handlers = $this->getParsersByDocumentType();
+        } else {
             $this->handlers = $handlers;
         }
     }
 
-    public function handle()
+    public function getParsersByDocumentType()
     {
-//        $text = $this->document->read($this->document->file_name_after);
-//        $text = mb_convert_encoding($text, "UTF-8");
-//        $parser = new Parser($text, $this->handlers);
-//
-//        $result = $parser->parse($this->document);
-        $this->getSemanticWords('PHP');
+        $addParsers = [];
+        switch ($this->document->document_type_id) {
+            case DocumentType::KURSOVOY:
+                break;
+        }
+
+        return array_merge(Parser::$defaultParsers, $addParsers);
     }
 
-    private function getSemanticWords(string $word)
+    public function textHandle()
     {
-        $wiki = new WordNetApi();
-        var_dump($wiki->getSynsets('')); exit();
+        $text = $this->document->read($this->document->file_name_after);
+        $text = mb_convert_encoding($text, "UTF-8");
+        $parser = new Parser($text, $this->handlers);
+
+        $result = $parser->parse($this->document);
+        $section = new Vsm();
+        $section->formVectorSpaceModel($parser->getResultParser(Property::KEY_WORDS));
+        $section->saveVsm($this->document);
+
+        $suitableSections = Section::getSectionsForDocument($this->document);
+        foreach ($suitableSections as $sectionName => $similarity) {
+            $documentSection = new DocumentSection();
+            $documentSection->document_id = $this->document->id;
+            $documentSection->section_id = Section::getIdByName($sectionName);
+            $documentSection->similarity = $similarity;
+            $documentSection->save();
+        }
     }
 
     /**
@@ -71,5 +82,11 @@ class DocumentHandler
     public function setHandlers(array $handlers): void
     {
         $this->handlers = $handlers;
+    }
+
+    private function getSemanticWords(string $word)
+    {
+        $wiki = new WordNetApi();
+//        var_dump($wiki->getSynsets('')); exit();
     }
 }

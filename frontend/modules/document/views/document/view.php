@@ -43,6 +43,12 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
             ],
             [
+                'attribute' => 'Тематический раздел',
+                'value' => function ($data) {
+                    return $data->section->name;
+                },
+            ],
+            [
                 'format' => 'html',
                 'attribute' => 'Преподаватели',
                 'value' => $teachers_by_doc,

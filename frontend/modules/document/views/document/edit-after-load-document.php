@@ -32,10 +32,31 @@ $this->params['breadcrumbs'][] = $this->title;
             <?= Select2::widget([
                 'model' => $document,
                 'name' => 'document_type_id',
-                'value' => '',
+                'value' => $document->document_type_id,
                 'data' => $types,
                 'options' => ['multiple' => false, 'placeholder' => 'Тип документа']
             ]);?>
+        </div>
+
+        <label>Тематический раздел:</label>
+        <div class="form-group">
+            <?php if (isset($document->section_id)) { ?>
+                <?= Select2::widget([
+                    'model' => $document,
+                    'name' => 'section_id',
+                    'value' => $document->section_id,
+                    'data' => $sections,
+                    'options' => ['multiple' => false, 'placeholder' => 'Выберите тематический раздел'],
+                ]);?>
+            <?php } else { ?>
+                <?= Select2::widget([
+                'name' => 'section_id',
+                'value' => $sections,
+                'data' => $sections,
+                'maintainOrder' => true,
+                'options' => ['multiple' => false, 'placeholder' => 'Выберите тематический раздел'],
+                ]);?>
+            <?php } ?>
         </div>
 
         <label>Преподаватели</label>
@@ -70,7 +91,7 @@ $this->params['breadcrumbs'][] = $this->title;
             ]);?>
         </div>
 
-        <label>Элестронные адреса</label>
+        <label>Электронные адреса</label>
         <div class="form-group">
             <?= Select2::widget([
                 'name' => 'emails[]',

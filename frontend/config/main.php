@@ -20,6 +20,9 @@ return [
             'class' => 'frontend\modules\document\Document',
             //'layout' => 'new',
         ],
+        'section' => [
+            'class' => 'frontend\modules\section\Section',
+        ],
     ],
     'components' => [
         'request' => [

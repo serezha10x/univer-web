@@ -203,7 +203,6 @@ class TeacherController extends Controller
             throw new NotFoundTeacherException();
         }
         $teacher = Teacher::findOne(['id' => $id]);
-//        $googleScholarId = $teacher->
 
         $googleScholarPublications = new GoogleScholarPublications('9aZ3OTcAAAAJ');
         $publications = $googleScholarPublications->getPublications();

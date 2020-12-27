@@ -14,7 +14,8 @@ class m201017_203250_section extends Migration
     {
         $this->createTable('section', [
             'id' => $this->primaryKey(),
-            'section' => $this->string(),
+            'name' => $this->string(),
+            'sections' => $this->text(),
         ]);
     }
 

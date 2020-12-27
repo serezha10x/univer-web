@@ -14,6 +14,7 @@ class m200920_140754_document extends Migration
             'document_name' => $this->string(),
             'description' => $this->text(),
             'document_type_id' => $this->integer(),
+            'section_id' => $this->integer(),
             'file_name_before' => $this->string(),
             'file_name_after' => $this->string(),
             'year' => $this->integer(),

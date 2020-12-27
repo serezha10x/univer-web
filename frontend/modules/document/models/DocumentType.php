@@ -14,6 +14,7 @@ use Yii;
  */
 class DocumentType extends \yii\db\ActiveRecord
 {
+    const KURSOVOY = 1;
     /**
      * {@inheritdoc}
      */

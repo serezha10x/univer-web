@@ -12,12 +12,8 @@ use frontend\modules\document\models\Keyword;
 use frontend\modules\document\models\Property;
 use frontend\modules\document\models\UploadDocumentForm;
 use frontend\modules\document\services\DocumentService;
-use frontend\modules\document\services\parser\Parser;
-use frontend\modules\document\services\parser\ParserDates;
-use frontend\modules\document\services\parser\ParserEmails;
-use frontend\modules\document\services\parser\ParserFio;
-use frontend\modules\document\services\parser\ParserFrequency;
-use frontend\modules\document\services\parser\ParserTeachers;
+use frontend\modules\document\services\vsm\VsmSimilar;
+use frontend\modules\section\models\Section;
 use frontend\modules\teacher\models\Teacher;
 use Yii;
 use yii\filters\AccessControl;
@@ -71,8 +67,6 @@ class DocumentController extends Controller
      */
     public function actionIndex()
     {
-        $handler = new DocumentHandler(new Document());
-        $handler->handle();
         $searchModel = new DocumentSearch();
         $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
 
@@ -144,14 +138,16 @@ class DocumentController extends Controller
             if ($document !== null) {
                 // file is uploaded successfully
                 $handler = new DocumentHandler($document);
-                $handler->handle();
+                $handler->textHandle();
 
                 Yii::$app->session->setFlash('uploadDocument', 'Документ успешно загружен');
                 $this->redirect(Url::toRoute(['update', 'id' => $document->id]));
             }
         }
 
-        return $this->render('create', ['model' => $model]);
+        $types = ArrayHelper::map(DocumentType::find()->all(), 'id', 'type');
+
+        return $this->render('create', ['model' => $model, 'types' => $types]);
     }
 
     /**
@@ -174,6 +170,7 @@ class DocumentController extends Controller
             $document->updateTeachers($request->post('teachers'));
             $document->load($request->post());
             $document->document_type_id = $request->post('document_type_id');
+            $document->section_id = $request->post('section_id');
             $document->save();
 
             return $this->redirect(['view', 'id' => $id]);
@@ -203,6 +200,7 @@ class DocumentController extends Controller
                 'teachers' => $teachers,
                 'document' => $document,
                 'types' => $types,
+                'sections' => $document->getSectionMap()
             ], $propertiesValue));
         }
     }
@@ -235,5 +233,19 @@ class DocumentController extends Controller
         $this->findModel($id)->delete();
 
         return $this->redirect(['index']);
+    }
+
+    public function actionSearch()
+    {
+        $document = Document::findOne(4);
+        $section = Section::findOne(5);
+
+        $vsmSimilar = new VsmSimilar(
+            $document,
+            $section
+        );
+
+        var_dump($vsmSimilar->cosineSimilar());
+        die;
     }
 }

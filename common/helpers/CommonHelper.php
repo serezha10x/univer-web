@@ -22,4 +22,16 @@ class CommonHelper
 
         return false;
     }
+
+    public static function ikey_exist(string $key, array $arr)
+    {
+        foreach ($arr as $arr_key => $value) {
+            if (strcasecmp($key, $arr_key)) {
+                var_dump($key, $arr_key);
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

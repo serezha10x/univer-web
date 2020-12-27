@@ -1,11 +1,13 @@
 <?php
 
+use kartik\file\FileInput;
+use kartik\select2\Select2;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model frontend\modules\document\models\Document */
 /* @var $form yii\widgets\ActiveForm */
+/* @var $typrs array */
 ?>
 
 <div class="document-form">
@@ -13,7 +15,22 @@ use yii\widgets\ActiveForm;
     <?php $form = ActiveForm::begin(['options' => ['enctype' => 'multipart/form-data']]); ?>
 
     <div class="form-group">
-        <?= $form->field($model, 'upload_document')->fileInput() ?>
+        <?= FileInput::widget([
+            'model' => $model,
+            'attribute' => 'upload_document',
+            'options' => ['multiple' => false]
+        ]);?>
+    </div>
+
+    <label>Тип документа</label>
+    <div class="form-group">
+        <?= Select2::widget([
+            'model' => $model,
+            'name' => 'document_type_id',
+            'value' => '',
+            'data' => $types,
+            'options' => ['multiple' => false, 'placeholder' => 'Тип документа']
+        ]);?>
     </div>
 
     <div class="form-group">

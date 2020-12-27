@@ -11,15 +11,32 @@ final class ParserFrequency extends ParserBase
 {
     protected $text;
     private $key_words;
+    private $key_freq_words;
+    private $count;
     private $morphy;
     private $num_max = 5;
 
-
-    public function __construct(&$text) {
+    public function __construct(&$text)
+    {
         parent::__construct($text);
         $this->key_words = array();
     }
 
+    /**
+     * @return mixed
+     */
+    public function getKeyFreqWords()
+    {
+        return $this->key_freq_words;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCount()
+    {
+        return $this->count;
+    }
 
     public function parse()
     {
@@ -27,20 +44,20 @@ final class ParserFrequency extends ParserBase
             $dir = $_SERVER['DOCUMENT_ROOT'] . "/vendor/cijic/phpmorphy/libs/phpmorphy/dicts";
             $lang = 'ru_RU';
             $this->morphy = new phpMorphy($dir, $lang);
-        } catch(phpMorphy_Exception $e) {
+        } catch (phpMorphy_Exception $e) {
             die('Error occured while creating phpMorphy instance: ' . $e->getMessage());
         }
 
         $arr_words = $this->tokenize($this->text);
 
-        $count = count($arr_words);
+        $this->count = $count = count($arr_words);
         // получаем части речи, необходимые для парсинга
         $need_words = require __DIR__ . "/config/need_part_speech.php";
 
         $array_defis = array();
 
         for ($i = 0; $i < $count; $i++) {
-            if (mb_strlen($arr_words[$i]) <= 3) {
+            if (mb_strlen($arr_words[$i]) <= 2) {
                 unset($arr_words[$i]);
                 continue;
             }
@@ -92,8 +109,8 @@ final class ParserFrequency extends ParserBase
                         unset($arr_words[$i]);
                         continue;
 
-                    // проверка на Ё
-                      } else if (mb_substr_count($arr_words[$i], 'Е') > 0) {
+                        // проверка на Ё
+                    } else if (mb_substr_count($arr_words[$i], 'Е') > 0) {
                         $true_change_word = $this->ChangeLetter($arr_words[$i], 'Е', 'Ё');
                         if ($true_change_word != NULL) {
                             $arr_words[$i] = $true_change_word;
@@ -108,14 +125,16 @@ final class ParserFrequency extends ParserBase
             }
         }
 
-        $arr_freq  = array_count_values($arr_words);
+        $arr_freq = array_count_values($arr_words);
+
         $maxes = $this->getMaxes($arr_freq, $this->num_max);
         $temp_array = array();
 
         foreach ($arr_freq as $key => $value) {
             for ($i = 0; $i < $this->num_max; $i++) {
                 if ($value == $maxes[$i]) {
-                    $key_word = $this->morphy->lemmatize($key)[0];
+                    $key_word = $this->morphy->lemmatize($key)[0] ?? $key;
+                    $this->key_freq_words[$key] = $value;
                     $this->key_words[] = $key_word;
                 }
             }
@@ -143,21 +162,61 @@ final class ParserFrequency extends ParserBase
             if ($i != count($this->key_words) - 1) $dict_parse_text .= $this->key_words[$i] . ", ";
             else $dict_parse_text .= $this->key_words[$i] . ".";
         }
+//        var_dump($this->count, $this->key_words, $this->key_freq_words);die;
         return $this->key_words;
     }
 
 
-    private function tokenize(string &$text) : array {
+    private function tokenize(string &$text): array
+    {
         // убираем все, кроме букв
-        $str_freq  = preg_replace('@([^А-Яа-яA-Za-z\s\-])@u', '', $text);
+        $str_freq = preg_replace('@([^А-Яа-яA-Za-z\s\-])@u', '', $text);
         // убираем все лишние пробелы
-        $str_freq  = preg_replace('@\s{2,}@u', ' ', $str_freq);
+        $str_freq = preg_replace('@\s{2,}@u', ' ', $str_freq);
         // разбиваем строку по пробелам
         return preg_split("@ @u", $str_freq);
     }
 
+    function ChangeLetter($word, $search, $replace)
+    {
+        if ($change_words = $this->str_replace_once($search, $replace, $word)) {
+            foreach ($change_words as $change_word) {
+                $result = $this->morphy->findWord($change_word, phpMorphy::IGNORE_PREDICT);
+                if ($result !== false) {
+                    return $change_word;
+                }
+            }
+        }
+        return null;
+    }
 
-    private function isUnique($big_arr, $arr) : bool {
+    private function str_replace_once($search, $replace, $subject): array
+    {
+        $count = mb_substr_count($subject, 'Е');
+        if ($count === 0) {
+            return false;
+        }
+        $pos = 0;
+        $change_words = array();
+        for ($i = 0; $i < $count; $i++) {
+            $pos = mb_strpos($subject, $search, $pos);
+            $change_words[] = $this->mb_substr_replace($subject, $replace, $pos);
+        }
+        return $change_words;
+    }
+
+    function mb_substr_replace($original, $replacement, $position)
+    {
+        $startString = mb_substr($original, 0, $position, "UTF-8");
+        $endString = mb_substr($original, $position + 1, mb_strlen($original), "UTF-8");
+
+        $out = $startString . $replacement . $endString;
+
+        return $out;
+    }
+
+    private function isUnique($big_arr, $arr): bool
+    {
         if (count($big_arr) == 0) {
             return false;
         }
@@ -182,8 +241,8 @@ final class ParserFrequency extends ParserBase
         return false;
     }
 
-
-    private function getMaxes($arr_freq, $num_max) {
+    private function getMaxes($arr_freq, $num_max)
+    {
         $maxes = array();
         for ($i = 0; $i < $num_max; $i++) {
             $temp_max = -1;
@@ -193,8 +252,7 @@ final class ParserFrequency extends ParserBase
                         $temp_max = $value;
                     }
                     continue;
-                }
-                else {
+                } else {
                     $isWas = false;
                     if ($value > $temp_max) {
                         for ($j = 0; $j < count($maxes); $j++) {
@@ -217,46 +275,8 @@ final class ParserFrequency extends ParserBase
         return $maxes;
     }
 
-
-    private function str_replace_once($search, $replace, $subject) : array {
-        $count = mb_substr_count($subject, 'Е');
-        if ($count === 0) {
-            return false;
-        }
-        $pos = 0;
-        $change_words = array();
-        for($i = 0; $i < $count; $i++) {
-            $pos = mb_strpos($subject, $search, $pos);
-            $change_words[] = $this->mb_substr_replace($subject, $replace, $pos);
-        }
-        return $change_words;
-    }
-
-    function mb_substr_replace($original, $replacement, $position)
+    function ArrayUnique(array $arr): array
     {
-        $startString = mb_substr($original, 0, $position, "UTF-8");
-        $endString = mb_substr($original, $position + 1, mb_strlen($original), "UTF-8");
-
-        $out = $startString . $replacement . $endString;
-
-        return $out;
-    }
-
-
-    function ChangeLetter($word, $search, $replace) {
-        if ($change_words = $this->str_replace_once($search, $replace, $word)) {
-            foreach ($change_words as $change_word) {
-                $result = $this->morphy->findWord($change_word, phpMorphy::IGNORE_PREDICT);
-                if ($result !== false) {
-                    return $change_word;
-                }
-            }
-        }
-        return NULL;
-    }
-
-
-    function ArrayUnique(array $arr) : array {
         $result = array();
         $elCounts = count($arr);
 

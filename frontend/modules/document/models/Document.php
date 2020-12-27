@@ -4,6 +4,7 @@ namespace frontend\modules\document\models;
 
 use frontend\modules\document\services\reader\ReaderCreator;
 use frontend\modules\literature\Literature;
+use frontend\modules\section\models\Section;
 use Yii;
 
 /**
@@ -12,11 +13,13 @@ use Yii;
  * @property int $id
  * @property string|null $document_name
  * @property int|null $document_type_id
+ * @property int|null $section_id
  * @property string|null $file_name_before
  * @property string|null $file_name_after
  * @property string|null $doc_source
  * @property int|null $year
  * @property string|null $description
+ * @property string|null $vsm
  *
  * @property DocumentType $documentType
  * @property DocumentTeacher[] $documentTeachers
@@ -44,6 +47,7 @@ class Document extends \yii\db\ActiveRecord
             [['document_type_id', 'year'], 'integer'],
             [['document_name', 'file_name_before', 'file_name_after', 'description'], 'string', 'max' => 255],
             [['document_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => DocumentType::className(), 'targetAttribute' => ['document_type_id' => 'id']],
+            [['vsm', 'section_id'], 'safe'],
         ];
     }
 
@@ -70,6 +74,16 @@ class Document extends \yii\db\ActiveRecord
     public function getDocumentType()
     {
         return $this->hasOne(DocumentType::className(), ['id' => 'document_type_id']);
+    }
+
+    /**
+     * Gets query for [[Section]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getSection()
+    {
+        return $this->hasOne(Section::className(), ['id' => 'section_id']);
     }
 
     /**
@@ -176,5 +190,36 @@ class Document extends \yii\db\ActiveRecord
             $documentTeacher->teacher_id = $teacherId;
             $documentTeacher->save();
         }
+    }
+
+    public function getVsm()
+    {
+        return json_decode($this->vsm, true);
+    }
+
+    public function setVsm(string $vsm)
+    {
+        $this->vsm = json_encode($vsm, JSON_UNESCAPED_UNICODE);
+    }
+
+    public function beforeSave($insert)
+    {
+        //$this->vsm = mb_strtoupper($this->vsm, 'UTF-8');
+        return parent::beforeSave($insert);
+    }
+
+    public function getSectionMap()
+    {
+        $result = [];
+        $docSections = DocumentSection::find()
+            ->joinWith('section', true)
+            ->where(['document_id' => $this->id])
+            ->orderBy(['similarity' => SORT_DESC])
+            ->all();
+        foreach ($docSections as $docSection) {
+            $result[$docSection->section->id] = $docSection->section->name . ': ' . $docSection->similarity;
+        }
+
+        return $result;
     }
 }

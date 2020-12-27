@@ -15,6 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <?= $this->render('upload-form', [
         'model' => $model,
+        'types' => $types
     ]) ?>
 
 </div>
