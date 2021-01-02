@@ -4,6 +4,7 @@
 namespace frontend\modules\document\services\vsm;
 
 
+use common\exceptions\MathException;
 use common\helpers\CommonHelper;
 use common\helpers\VectorHelper;
 use frontend\modules\document\models\Document;
@@ -33,11 +34,14 @@ class VsmSimilar
             $vector1 = [];
             $vector2 = [];
             VectorHelper::convertVsmToVector($words, $vector1, $vector2);
-
+//var_dump($words, VectorHelper::multiplyVectors($vector1, $vector2),
+//    VectorHelper::scalarLengthVectors($vector1, $vector2));die;
             return VectorHelper::multiplyVectors($vector1, $vector2) /
                 VectorHelper::scalarLengthVectors($vector1, $vector2);
         } catch (ErrorException $ex) {
-
+            die($ex->getMessage());
+        } catch (MathException $ex) {
+            return 0;
         }
     }
 
@@ -47,9 +51,11 @@ class VsmSimilar
         $sectionVsm = $this->section->getVsm();
         $generalWords = [];
 
-        foreach ($docVsm as $docWord => $docFreq) {
-            if (key_exists($docWord, $sectionVsm)) {
-                $generalWords[] = ['word' => $docWord, 'docFreq' => $docFreq, 'sectionFreq' => $sectionVsm[$docWord]];
+        foreach ($sectionVsm as $sectionWord => $sectionFreq) {
+            if (key_exists($sectionWord, $docVsm)) {
+                $generalWords[] = ['word' => $sectionWord, 'docFreq' => $sectionFreq, 'sectionFreq' => $sectionVsm[$sectionWord]];
+            } else {
+                $generalWords[] = ['word' => $sectionWord, 'docFreq' => 0, 'sectionFreq' => $sectionVsm[$sectionWord]];
             }
         }
 

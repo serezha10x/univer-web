@@ -10,6 +10,17 @@ use yii\grid\GridView;
 $this->title = 'Преподаватели';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
+
+<style>
+    .grid-view td {
+        white-space: nowrap;
+    }
+
+    .grid-view td .wrap {
+        white-space: pre-wrap;
+    }
+</style>
+
 <div class="teacher-index">
 
     <h1><?= Html::encode($this->title) ?></h1>

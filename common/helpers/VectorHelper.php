@@ -22,12 +22,12 @@ class VectorHelper
             throw new MathException('Cannot multiply vectors with different elements count');
         }
 
-        $value = 0;
+        $mult = 0;
         foreach ($vector1 as $word => $value) {
-            $value += ($vector1[$word] * $vector2[$word]);
+            $mult += ($vector1[$word] * $vector2[$word]);
         }
 
-        return $value;
+        return $mult;
     }
 
     public static function scalarLengthVectors(array $vector1, array $vector2)
@@ -40,6 +40,9 @@ class VectorHelper
         $sum = 0;
         foreach ($vector as $point) {
             $sum += pow($point, 2);
+        }
+        if ($sum === 0) {
+            throw new MathException('Division by zero');
         }
 
         return sqrt($sum);

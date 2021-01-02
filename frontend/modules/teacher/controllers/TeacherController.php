@@ -15,6 +15,7 @@ use yii\filters\AccessControl;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use function DI\value;
 
 /**
  * TeacherController implements the CRUD actions for Teacher model.
@@ -203,8 +204,9 @@ class TeacherController extends Controller
             throw new NotFoundTeacherException();
         }
         $teacher = Teacher::findOne(['id' => $id]);
+        $code = substr($teacher->google_scholar, -12, 12);
 
-        $googleScholarPublications = new GoogleScholarPublications('9aZ3OTcAAAAJ');
+        $googleScholarPublications = new GoogleScholarPublications($code);
         $publications = $googleScholarPublications->getPublications();
         $docs = $googleScholarPublications->convertToDocuments($publications);
 

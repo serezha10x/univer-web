@@ -3,6 +3,7 @@
 namespace frontend\modules\section\models;
 
 use frontend\modules\document\models\Document;
+use frontend\modules\document\models\DocumentSection;
 use frontend\modules\document\services\vsm\VsmSimilar;
 use Yii;
 
