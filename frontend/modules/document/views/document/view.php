@@ -43,9 +43,16 @@ $this->params['breadcrumbs'][] = $this->title;
                 },
             ],
             [
+                'format' => 'html',
                 'attribute' => 'Тематический раздел',
                 'value' => function ($data) {
-                    return $data->section->name;
+                    return \common\helpers\VectorHelper::getStringFromVector($data->getVsm());
+                },
+            ],
+            [
+                'attribute' => 'Контекстный вектор',
+                'value' => function ($data) {
+                    return $data->section->sections;
                 },
             ],
             [

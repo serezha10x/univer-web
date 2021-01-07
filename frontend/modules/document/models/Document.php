@@ -5,6 +5,7 @@ namespace frontend\modules\document\models;
 use frontend\modules\document\services\reader\ReaderCreator;
 use frontend\modules\literature\Literature;
 use frontend\modules\section\models\Section;
+use tpmanc\csvhelper\CsvHelper;
 use Yii;
 
 /**
@@ -12,16 +13,19 @@ use Yii;
  *
  * @property int $id
  * @property string|null $document_name
+ * @property string|null $description
  * @property int|null $document_type_id
  * @property int|null $section_id
  * @property string|null $file_name_before
  * @property string|null $file_name_after
- * @property string|null $doc_source
  * @property int|null $year
- * @property string|null $description
+ * @property string|null $doc_source
  * @property string|null $vsm
  *
  * @property DocumentType $documentType
+ * @property Section $section
+ * @property DocumentProperty[] $documentProperties
+ * @property DocumentSection[] $documentSections
  * @property DocumentTeacher[] $documentTeachers
  * @property Keyword[] $keywords
  * @property Literature[] $literatures
@@ -194,10 +198,10 @@ class Document extends \yii\db\ActiveRecord
 
     public function getVsm()
     {
-        return json_decode($this->vsm, true);
+        return json_decode($this->vsm, true) ?? [];
     }
 
-    public function setVsm(string $vsm)
+    public function setVsm($vsm)
     {
         $this->vsm = json_encode($vsm, JSON_UNESCAPED_UNICODE);
     }
@@ -221,5 +225,23 @@ class Document extends \yii\db\ActiveRecord
         }
 
         return $result;
+    }
+
+    public function setCsv()
+    {
+        $file = CsvHelper::create()->delimiter(',');
+        $file->encode('cp1251', 'utf-8'); // change encoding
+
+        foreach ($this->getVsm() as $vsm) {
+            $words = json_decode($vsm, true, 512, JSON_UNESCAPED_UNICODE);
+            var_dump($this->getVsm());die;
+            $csvLine = '';
+            foreach ($words as $word) {
+                $csvLine .= ($word . ',');
+            }
+            $file->addLine($csvLine);
+        }
+
+        $file->save('document/csv/' . $this->document_name . '.csv');
     }
 }

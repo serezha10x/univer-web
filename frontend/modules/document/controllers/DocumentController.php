@@ -2,6 +2,8 @@
 
 namespace frontend\modules\document\controllers;
 
+use common\helpers\CommonHelper;
+use common\services\wiki\WikipediaApi;
 use frontend\modules\document\handlers\DocumentHandler;
 use frontend\modules\document\models\Document;
 use frontend\modules\document\models\DocumentProperty;
@@ -11,11 +13,13 @@ use frontend\modules\document\models\DocumentType;
 use frontend\modules\document\models\Keyword;
 use frontend\modules\document\models\Property;
 use frontend\modules\document\models\UploadDocumentForm;
+use frontend\modules\document\models\UploadWebDocumentForm;
 use frontend\modules\document\services\DocumentService;
-use frontend\modules\document\services\vsm\VsmSimilar;
 use frontend\modules\section\models\Section;
+use frontend\modules\section\service\TensorHandler;
 use frontend\modules\teacher\models\Teacher;
 use Yii;
+use yii\data\ArrayDataProvider;
 use yii\filters\AccessControl;
 use yii\filters\VerbFilter;
 use yii\helpers\ArrayHelper;
@@ -139,6 +143,7 @@ class DocumentController extends Controller
                 // file is uploaded successfully
                 $handler = new DocumentHandler($document);
                 $handler->textHandle();
+                $document->setCsv();
 
                 Yii::$app->session->setFlash('uploadDocument', 'Документ успешно загружен');
                 $this->redirect(Url::toRoute(['update', 'id' => $document->id]));
@@ -237,15 +242,45 @@ class DocumentController extends Controller
 
     public function actionSearch()
     {
-        $document = Document::findOne(4);
-        $section = Section::findOne(5);
+        $tensorHandler = new TensorHandler(Section::findOne(1),
+            'PHP, JAVA КОМПИЛЯТОР');
+        $tensorHandler->getVsm();
+//        $tensor = $t->getT(Section::findOne(1));
+//        $b = $t->additiveConvolution3($tensor);
+//        $a = $t->getQueryVsm('PHP, JAVA КОМПИЛЯТОР');
+//        $t->getQ($b, $a);
+//        $wiki = new WikipediaApi();
+//        echo($wiki->wiktionary('Java'));die;
+        $request = Yii::$app->request;
+        $uploadForm = new UploadWebDocumentForm();
 
-        $vsmSimilar = new VsmSimilar(
-            $document,
-            $section
-        );
+        if ($request->isPost && $uploadForm->load(Yii::$app->request->post())) {
 
-        var_dump($vsmSimilar->cosineSimilar());
-        die;
+            $userQuery = ['PHP' => 1];//$request->post()['search'];
+
+            $document = new Document();
+            $document->setVsm($userQuery);
+            $suitableSections = Section::getSectionsForDocument($document);
+
+//            $result = Document::find()->where(['LIKE', 'vsm', "PHP"])->all();
+
+            var_dump($suitableSections);
+            die;
+
+            $dataProvider = new ArrayDataProvider ([
+                'allModels' => $docs,
+                'pagination' => [
+                    'pageSize' => 20,
+                ],
+            ]);
+
+            return $this->render('show-upload-web-document', [
+                'uploadForm' => $uploadForm,
+                'docs' => $docs,
+                'dataProvider' => $dataProvider,
+            ]);
+        }
+
+        return $this->render('/document-upload/upload-web-form', ['model' => new UploadWebDocumentForm()]);
     }
 }

@@ -26,7 +26,7 @@ class VsmSimilar
     public function cosineSimilar(): float
     {
         try {
-            $words = $this->findGeneralWords();
+            $words = $this->getGeneralVsm();
             if (empty($words)) {
                 return 0;
             }
@@ -34,8 +34,7 @@ class VsmSimilar
             $vector1 = [];
             $vector2 = [];
             VectorHelper::convertVsmToVector($words, $vector1, $vector2);
-//var_dump($words, VectorHelper::multiplyVectors($vector1, $vector2),
-//    VectorHelper::scalarLengthVectors($vector1, $vector2));die;
+
             return VectorHelper::multiplyVectors($vector1, $vector2) /
                 VectorHelper::scalarLengthVectors($vector1, $vector2);
         } catch (ErrorException $ex) {
@@ -45,7 +44,7 @@ class VsmSimilar
         }
     }
 
-    private function findGeneralWords(): array
+    private function getGeneralVsm(): array
     {
         $docVsm = $this->document->getVsm();
         $sectionVsm = $this->section->getVsm();

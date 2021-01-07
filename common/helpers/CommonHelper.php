@@ -34,4 +34,10 @@ class CommonHelper
 
         return false;
     }
+
+    public static function getKeywordsFromQuery(string $query): array
+    {
+        return preg_split("@[^A-Za-zА-Яа-я]+@u", $query);
+    }
+
 }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "50b51617925848a0dce97f19db46a929",
+    "content-hash": "a300acaeacacebdb023ef3b0f108707a",
     "packages": [
         {
             "name": "adam-lutka/php-enum",
@@ -3303,6 +3303,53 @@
                 "qrcode"
             ],
             "time": "2020-02-14T14:20:12+00:00"
+        },
+        {
+            "name": "tpmanc/csvhelper",
+            "version": "1.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/tpmanc/csv-helper.git",
+                "reference": "1bac9a1928ed654f73f58976791c62fbd369ab73"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/tpmanc/csv-helper/zipball/1bac9a1928ed654f73f58976791c62fbd369ab73",
+                "reference": "1bac9a1928ed654f73f58976791c62fbd369ab73",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~5.3"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "tpmanc\\csvhelper\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "tpmanc",
+                    "email": "tpxtrime@mail.ru",
+                    "homepage": "https://github.com/tpmanc",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Helper class for working with CSV files",
+            "homepage": "https://github.com/tpmanc/csv-helper",
+            "keywords": [
+                "csv",
+                "helper",
+                "reading"
+            ],
+            "time": "2016-08-17T09:41:21+00:00"
         },
         {
             "name": "vanderlee/php-sentence",
@@ -6629,7 +6676,8 @@
     "platform": {
         "php": ">=7.2.0",
         "ext-curl": "*",
-        "ext-zip": "*"
+        "ext-zip": "*",
+        "ext-json": "*"
     },
     "platform-dev": [],
     "plugin-api-version": "1.1.0"

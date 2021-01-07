@@ -121,20 +121,12 @@ class WikipediaApi
             \phpQuery::newDocument($html);
 
         $synonyms = pq('html body div#content.mw-body div#bodyContent.mw-body-content div#mw-content-text.mw-content-ltr div.mw-parser-output ol li span.ib-content')->find('a')->text();
+//        $synonyms = pq('html body div#content.mw-body div#bodyContent.mw-body-content div#mw-content-text.mw-content-ltr div.mw-parser-output ol li')->find('span.Latn')->text();
+        var_dump(explode('\n', $synonyms));die;
 
+        \phpQuery::unloadDocuments();
 
-            var_dump($synonyms);
-
-            \phpQuery::unloadDocuments();
-        //$filename = 'https://ru.wiktionary.org/wiki/MYSQL';
-        //$response = file_get_contents($filename);
-        //$xml = simplexml_load_file($filename) or die("asd");
-        //var_dump($xml);
-//        $xml = new SimpleXMLElement($response);
-        //$parser = xml_parser_create();
-        //xml_parse($parser, $response);
-
-        return (stripos($synonyms, 'comput') === false ? false : true OR stripos($synonyms, 'program') === false ? false : true OR stripos($synonyms, 'system') === false ? false : true);
+        return preg_split('@\s\n@u', $synonyms);
     }
 
 

@@ -11,13 +11,13 @@ use Yii;
  * This is the model class for table "section".
  *
  * @property int $id
+ * @property int|null $parent_id
  * @property string|null $name
  * @property string|null $sections
  *
  * @property DocumentSection[] $documentSections
  */
-class
-Section extends \yii\db\ActiveRecord
+class Section extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}
@@ -36,7 +36,7 @@ Section extends \yii\db\ActiveRecord
             [['name', 'sections'], 'required'],
             [['sections'], 'string'],
             [['name'], 'string', 'max' => 255],
-        ];
+            [['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => Section::className(), 'targetAttribute' => ['parent_id' => 'id']],        ];
     }
 
     /**
@@ -61,9 +61,29 @@ Section extends \yii\db\ActiveRecord
         return $this->hasMany(DocumentSection::className(), ['section_id' => 'id']);
     }
 
+    /**
+     * Gets query for [[Parent]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getParent()
+    {
+        return $this->hasOne(Section::className(), ['id' => 'parent_id']);
+    }
+
     public function getVsm()
     {
-        return json_decode($this->sections, true, 512, JSON_UNESCAPED_UNICODE);
+        $sections = json_decode($this->sections, true, 512, JSON_UNESCAPED_UNICODE);
+//        $parent = $this->parent_id;
+//        $section = $this;
+//
+//        while ($parent !== null) {
+//            $section = $section->getParent()->one();//self::findOne(['parent_id' => $parent]); //$this->getParent()->one()->sections
+//            $parent = $section->parent_id;
+//            $sections = array_merge($sections, json_decode($section->sections, true, 512, JSON_UNESCAPED_UNICODE));
+//        }
+
+        return $sections;
     }
 
     public static function getSectionsForDocument(Document $document)
@@ -73,7 +93,10 @@ Section extends \yii\db\ActiveRecord
 
         foreach ($sections as $section) {
             $similar = new VsmSimilar($document, $section);
-            $similarSections[$section->name] = $similar->cosineSimilar();
+            $cos = $similar->cosineSimilar();
+            if ($cos !== 0.0) {
+                $similarSections[$section->name] = $similar->cosineSimilar();
+            }
         }
 
         return $similarSections;

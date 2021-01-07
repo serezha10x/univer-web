@@ -47,4 +47,15 @@ class VectorHelper
 
         return sqrt($sum);
     }
+
+    public static function getStringFromVector(array $vsm)
+    {
+        $result = '';
+
+        foreach ($vsm as $word => $freq) {
+            $result .= "$word: $freq<br>";
+        }
+
+        return $result;
+    }
 }

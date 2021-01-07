@@ -28,6 +28,7 @@ class m210102_133415_insert_sub_sections extends Migration
 
         $sub_prog = new Section();
         $sub_prog->name = 'Веб-Программирование';
+        $sub_prog->parent_id = $prog->id;
         $sub_prog->sections = json_encode([
             'PHP' => 1,
             'Java Script' => 1,
@@ -38,10 +39,20 @@ class m210102_133415_insert_sub_sections extends Migration
         ], JSON_UNESCAPED_UNICODE);
         $sub_prog->save();
 
-        $sub_section = new SubSection();
-        $sub_section->parent_id = $prog->id;
-        $sub_section->child_id = $sub_prog->id;
-        $sub_section->save();
+        $sub_prog_2 = new Section();
+        $sub_prog_2->name = 'Backend';
+        $sub_prog_2->parent_id = $sub_prog->id;
+        $sub_prog_2->sections = json_encode([
+            'PHP' => 1,
+            'Django' => 0.6,
+            'Yii2' => 0.9,
+            'Python' => 0.5,
+            'Laravel' => 0.9,
+            'JSON' => 0.6,
+            'Doctrine' => 0.8,
+            'Symphony' => 0.75
+        ], JSON_UNESCAPED_UNICODE);
+        $sub_prog_2->save();
 
         $this->insert('section', ['name' => 'Сервера',
             'sections' => json_encode([
