@@ -12,12 +12,17 @@ use Yii;
  * @property int|null $document_id
  * @property int|null $section_id
  * @property float|null $similarity
+ * @property float|null $soft_similarity
+ * @property boolean is_soft_similarity_chosen
  *
  * @property Document $document
  * @property Section $section
  */
 class DocumentSection extends \yii\db\ActiveRecord
 {
+    const SOFT_SIMILARITY_TYPE = 'Мягкий косинус';
+    const COMMON_SIMILARITY_TYPE = 'Обычный косинус';
+
     /**
      * {@inheritdoc}
      */
@@ -33,7 +38,8 @@ class DocumentSection extends \yii\db\ActiveRecord
     {
         return [
             [['document_id', 'section_id'], 'integer'],
-            [['similarity'], 'number'],
+            [['similarity', 'soft_similarity'], 'number'],
+            [['is_soft_similarity_chosen'], 'boolean'],
             [['document_id'], 'exist', 'skipOnError' => true, 'targetClass' => Document::className(), 'targetAttribute' => ['document_id' => 'id']],
             [['section_id'], 'exist', 'skipOnError' => true, 'targetClass' => Section::className(), 'targetAttribute' => ['section_id' => 'id']],
         ];
@@ -70,5 +76,11 @@ class DocumentSection extends \yii\db\ActiveRecord
     public function getSection()
     {
         return $this->hasOne(Section::className(), ['id' => 'section_id']);
+    }
+
+    public function setSoftSimilar(bool $isSoftSimilarityChosen)
+    {
+        $this->is_soft_similarity_chosen = $isSoftSimilarityChosen;
+        $this->save();
     }
 }

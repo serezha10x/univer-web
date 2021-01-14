@@ -227,21 +227,32 @@ class Document extends \yii\db\ActiveRecord
         return $result;
     }
 
-    public function setCsv()
+    public function getSectionSoftMap()
     {
-        $file = CsvHelper::create()->delimiter(',');
-        $file->encode('cp1251', 'utf-8'); // change encoding
-
-        foreach ($this->getVsm() as $vsm) {
-            $words = json_decode($vsm, true, 512, JSON_UNESCAPED_UNICODE);
-            var_dump($this->getVsm());die;
-            $csvLine = '';
-            foreach ($words as $word) {
-                $csvLine .= ($word . ',');
-            }
-            $file->addLine($csvLine);
+        $result = [];
+        $docSections = DocumentSection::find()
+            ->joinWith('section', true)
+            ->where(['document_id' => $this->id])
+            ->orderBy(['soft_similarity' => SORT_DESC])
+            ->all();
+        foreach ($docSections as $docSection) {
+            $result[$docSection->section->id] = $docSection->section->name . ': ' . $docSection->soft_similarity;
         }
 
-        $file->save('document/csv/' . $this->document_name . '.csv');
+        return $result;
+    }
+
+    public function getDocumentSection()
+    {
+        return DocumentSection::findOne(['section_id' => $this->section_id, 'document_id' => $this->id]);
+    }
+
+    public static function getDocumentsByIds($ids)
+    {
+        $ids = array_map(function ($item) {
+            return ['id' => $item];
+        }, $ids);
+
+        return Document::find()->where(['IN', ['id'], $ids])->all();
     }
 }

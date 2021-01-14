@@ -83,15 +83,25 @@ class DocumentController extends Controller
     /**
      * Displays a single Document model.
      * @param integer $id
+     * @param null $ids
      * @return mixed
      * @throws NotFoundHttpException if the model cannot be found
      */
-    public function actionView($id)
+    public function actionView($id = null, $ids = null)
     {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-            'teachers_by_doc' => DocumentService::getTeacherByDocTeacher($id),
-        ]);
+        if ($id !== null) {
+            return $this->render('view', [
+                'documents' => [$this->findModel($id)],
+                'teachers_by_doc' => DocumentService::getTeacherByDocTeacher($id),
+            ]);
+        } else if ($ids !== null) {
+            $documents = Document::getDocumentsByIds($ids);
+            return $this->render('view', [
+                'documents' => $documents,
+                'teachers_by_doc' => DocumentService::getTeacherByDocTeacher($id),
+            ]);
+        }
+
     }
 
     /**
@@ -137,16 +147,25 @@ class DocumentController extends Controller
         $model = new UploadDocumentForm();
 
         if (Yii::$app->request->isPost) {
-            $model->upload_document = UploadedFile::getInstance($model, 'upload_document');
-            $document = $model->upload();
-            if ($document !== null) {
-                // file is uploaded successfully
-                $handler = new DocumentHandler($document);
-                $handler->textHandle();
-                $document->setCsv();
+            $model->uploadDocuments = UploadedFile::getInstances($model, 'uploadDocuments');
+            $documents = $model->upload();
+            // file is uploaded successfully
+            if ($documents !== null) {
+                if (count($documents) === 1) {
+                    $handler = new DocumentHandler($documents[0]);
+                    $handler->textHandle();
 
-                Yii::$app->session->setFlash('uploadDocument', 'Документ успешно загружен');
-                $this->redirect(Url::toRoute(['update', 'id' => $document->id]));
+                    Yii::$app->session->setFlash('uploadDocument', 'Документ успешно загружен');
+                    $this->redirect(Url::toRoute(['update', 'id' => $documents[0]->id]));
+                } else {
+                    foreach ($documents as $document) {
+                        $handler = new DocumentHandler($document);
+                        $handler->textHandle();
+                    }
+
+                    Yii::$app->session->setFlash('uploadDocument', 'Документы успешно загружены');
+                    $this->redirect(Url::toRoute(['view', 'id' => $documents[0]->id]));
+                }
             }
         }
 
@@ -177,6 +196,7 @@ class DocumentController extends Controller
             $document->document_type_id = $request->post('document_type_id');
             $document->section_id = $request->post('section_id');
             $document->save();
+            $document->getDocumentSection()->setSoftSimilar($request->post('similar_type') ?? false);
 
             return $this->redirect(['view', 'id' => $id]);
         } else {
@@ -205,7 +225,8 @@ class DocumentController extends Controller
                 'teachers' => $teachers,
                 'document' => $document,
                 'types' => $types,
-                'sections' => $document->getSectionMap()
+                'sections' => $document->getSectionMap(),
+                'softSections' => $document->getSectionSoftMap(),
             ], $propertiesValue));
         }
     }
@@ -242,9 +263,16 @@ class DocumentController extends Controller
 
     public function actionSearch()
     {
-        $tensorHandler = new TensorHandler(Section::findOne(1),
-            'PHP, JAVA КОМПИЛЯТОР');
-        $tensorHandler->getVsm();
+        $tensorHandler = new TensorHandler(Section::findOne(1),'PHP, JAVA КОМПИЛЯТОР');
+        $vsm = $tensorHandler->getVsm();
+        var_dump($vsm);die;
+
+
+
+
+
+
+
 //        $tensor = $t->getT(Section::findOne(1));
 //        $b = $t->additiveConvolution3($tensor);
 //        $a = $t->getQueryVsm('PHP, JAVA КОМПИЛЯТОР');
@@ -264,8 +292,7 @@ class DocumentController extends Controller
 
 //            $result = Document::find()->where(['LIKE', 'vsm', "PHP"])->all();
 
-            var_dump($suitableSections);
-            die;
+            var_dump($suitableSections);die;
 
             $dataProvider = new ArrayDataProvider ([
                 'allModels' => $docs,

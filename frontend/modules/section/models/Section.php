@@ -46,8 +46,8 @@ class Section extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'Name',
-            'sections' => 'Sections',
+            'name' => 'Название раздела',
+            'sections' => 'Ключевые слова',
         ];
     }
 
@@ -93,10 +93,8 @@ class Section extends \yii\db\ActiveRecord
 
         foreach ($sections as $section) {
             $similar = new VsmSimilar($document, $section);
-            $cos = $similar->cosineSimilar();
-            if ($cos !== 0.0) {
-                $similarSections[$section->name] = $similar->cosineSimilar();
-            }
+            $similarSections[$section->name] = ['similarity' => $similar->cosineSimilar(),
+                                                'soft_similarity' => $similar->cosineSoftSimilar()];
         }
 
         return $similarSections;

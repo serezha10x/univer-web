@@ -17,8 +17,8 @@ use yii\widgets\ActiveForm;
     <div class="form-group">
         <?= FileInput::widget([
             'model' => $model,
-            'attribute' => 'upload_document',
-            'options' => ['multiple' => false]
+            'attribute' => 'uploadDocuments[]',
+            'options' => ['multiple' => true]
         ]);?>
     </div>
 

@@ -7,7 +7,7 @@ use yii\grid\GridView;
 /* @var $searchModel frontend\modules\section\models\SectionSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Тематики';
+$this->title = 'Разделы';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
 <div class="section-index">
@@ -15,7 +15,7 @@ $this->params['breadcrumbs'][] = $this->title;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Добавить тематику', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Добавить раздел', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?= GridView::widget([

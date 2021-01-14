@@ -9,7 +9,7 @@ use yii\grid\GridView;
 /* @var $searchModel frontend\modules\document\models\DocumentSearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Documents';
+$this->title = 'Документы';
 $this->params['breadcrumbs'][] = $this->title;
 
 ?>
@@ -28,6 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Загрузить документ локально', ['upload-local'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Загрузить документы', ['upload-local-many'], ['class' => 'btn btn-danger']) ?>
         <?= Html::a('Загрузить документ с сети', '/document/document-upload/upload-web', ['class' => 'btn btn-warning']) ?>
         <?= Html::a('Поиск документов', ['search'], ['class' => 'btn btn-info']) ?>
 

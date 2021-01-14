@@ -29,20 +29,29 @@ class TensorHandler
     public function __construct($section, $query)
     {
         $this->section = $section;
-        $this->query = CommonHelper::getKeywordsFromQuery($query);
-        $this->query = $this->getQueryVsm();
+        $this->query = $query;
+//        $this->query = CommonHelper::getKeywordsFromQuery($query);
+//        $this->query = $this->getQueryVsm();
     }
 
 
     public function getVsm()
     {
+        /* тензор по ключевым словам */
         $thematicTensor = $this->getThematicTensor();
+//                var_dump($thematicTensor);die;
         /* свертка тензора по ключевым словам */
         $convolutionCube = MathHelper::additiveConvolutionCube($thematicTensor);
-
+        /* свертка матрицы по поисковому запросу */
         $convolutionMatrix = MathHelper::additiveConvolutionMatrix($convolutionCube, $this->query);
-//        var_dump(1,$convolutionMatrix);die;
+
         return $convolutionMatrix;
+    }
+
+    public function getAdditiveConvolutionCube()
+    {
+        $thematicTensor = $this->getThematicTensor();
+        return MathHelper::additiveConvolutionCube($thematicTensor);
     }
 
     public function getThematicTensor()

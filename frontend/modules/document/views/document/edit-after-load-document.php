@@ -2,6 +2,7 @@
 
 use frontend\modules\teacher\models\Teacher;
 use kartik\select2\Select2;
+use kartik\switchinput\SwitchInput;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
@@ -35,7 +36,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => $document->document_type_id,
                 'data' => $types,
                 'options' => ['multiple' => false, 'placeholder' => 'Тип документа']
-            ]);?>
+            ]); ?>
         </div>
 
         <label>Тематический раздел:</label>
@@ -47,17 +48,51 @@ $this->params['breadcrumbs'][] = $this->title;
                     'value' => $document->section_id,
                     'data' => $sections,
                     'options' => ['multiple' => false, 'placeholder' => 'Выберите тематический раздел'],
-                ]);?>
+                ]); ?>
             <?php } else { ?>
                 <?= Select2::widget([
-                'name' => 'section_id',
-                'value' => $sections,
-                'data' => $sections,
-                'maintainOrder' => true,
-                'options' => ['multiple' => false, 'placeholder' => 'Выберите тематический раздел'],
-                ]);?>
+                    'name' => 'section_id',
+                    'value' => $sections,
+                    'data' => $sections,
+                    'maintainOrder' => true,
+                    'options' => ['multiple' => false, 'placeholder' => 'Выберите тематический раздел'],
+                ]); ?>
             <?php } ?>
         </div>
+
+        <label>Тематический раздел по мягкому косинусу:</label>
+        <div class="form-group">
+            <?php if (isset($document->section_id)) { ?>
+                <?= Select2::widget([
+                    'model' => $document,
+                    'name' => 'section_id',
+                    'value' => $document->section_id,
+                    'data' => $softSections,
+                    'options' => ['multiple' => false, 'placeholder' => 'Выберите тематический раздел'],
+                ]); ?>
+            <?php } else { ?>
+                <?= Select2::widget([
+                    'name' => 'section_id',
+                    'value' => $softSections,
+                    'data' => $softSections,
+                    'maintainOrder' => true,
+                    'options' => ['multiple' => false, 'placeholder' => 'Выберите тематический раздел'],
+                ]); ?>
+            <?php } ?>
+        </div>
+        <?php
+
+        echo SwitchInput::widget([
+            'name' => 'similar_type',
+            'value' => [true],
+            'indeterminateValue' => false,
+            'pluginOptions' => [
+                'handleWidth' => 160,
+                'onText' => 'Обычный косинус',
+                'offText' => 'Мягкий косинус'
+            ]
+        ]);
+        ?>
 
         <label>Преподаватели</label>
         <div class="form-group">
@@ -66,7 +101,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'value' => Teacher::getTeachersIdsBySurname($foundTeachers),
                 'data' => $teachers,
                 'options' => ['multiple' => true, 'placeholder' => 'Преподаватели']
-            ]);?>
+            ]); ?>
         </div>
 
         <label>Ключевые слова</label>
@@ -77,7 +112,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'data' => $keywords,
                 'maintainOrder' => true,
                 'options' => ['multiple' => true, 'placeholder' => 'Ключевые слова']
-            ]);?>
+            ]); ?>
         </div>
 
         <label>ФИО</label>
@@ -88,7 +123,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'data' => $fios,
                 'maintainOrder' => true,
                 'options' => ['multiple' => true, 'placeholder' => 'ФИО'],
-            ]);?>
+            ]); ?>
         </div>
 
         <label>Электронные адреса</label>
@@ -99,7 +134,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'data' => $emails,
                 'maintainOrder' => true,
                 'options' => ['multiple' => true, 'placeholder' => 'Emails'],
-            ]);?>
+            ]); ?>
         </div>
 
         <label>Даты</label>
@@ -110,7 +145,7 @@ $this->params['breadcrumbs'][] = $this->title;
                 'data' => $dates,
                 'maintainOrder' => true,
                 'options' => ['multiple' => true, 'placeholder' => 'Даты'],
-            ]);?>
+            ]); ?>
         </div>
 
         <div class="form-group">

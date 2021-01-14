@@ -59,11 +59,13 @@ class DocumentHandler
         $section->saveVsm($this->document);
 
         $suitableSections = Section::getSectionsForDocument($this->document);
-        foreach ($suitableSections as $sectionName => $similarity) {
+        foreach ($suitableSections as $name => $section) {
             $documentSection = new DocumentSection();
             $documentSection->document_id = $this->document->id;
-            $documentSection->section_id = Section::getIdByName($sectionName);
-            $documentSection->similarity = $similarity;
+            $documentSection->section_id = Section::getIdByName($name);
+            $documentSection->similarity = $section['similarity'];
+            $documentSection->soft_similarity = $section['soft_similarity'];
+
             $documentSection->save();
         }
     }

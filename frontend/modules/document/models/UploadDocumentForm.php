@@ -13,48 +13,61 @@ use yii\base\Model;
 class UploadDocumentForm extends Model implements IDocumentUpload
 {
     const MAX_FILE_SIZE_MB = 10;
+    const MAX_FILES = 10;
 
     public $document_type_id;
-    public $upload_document;
+    public $uploadDocuments;
 
     public function rules()
     {
         return [
             [['document_type_id'], 'safe'],
             [['document_type_id'], 'integer'],
-            [['upload_document'], 'required'],
-            [['upload_document'], 'file', 'skipOnEmpty' => false, 'maxSize' => 1024 * 1024 * self::MAX_FILE_SIZE_MB,
-                'extensions' => Yii::$app->getModule('document')->params['allowFormats']],
+            [['uploadDocuments'], 'required'],
+            [['uploadDocuments'], 'file', 'skipOnEmpty' => false, 'maxSize' => 1024 * 1024 * self::MAX_FILE_SIZE_MB,
+                'extensions' => Yii::$app->getModule('document')->params['allowFormats'], 'maxFiles' => self::MAX_FILES],
         ];
     }
 
     /**
      * @param Document|null $document
-     * @return bool|Document
+     * @return bool|array
      * @throws Exception
      */
     public function upload(Document $document = null)
     {
         if ($this->validate()) {
-            $request = Yii::$app->request->post();
-            $document = new Document();
-            $document->document_name = $this->upload_document->baseName;
-            $document->file_name_before = $this->upload_document->baseName . '.' . $this->upload_document->extension;
-            $document->file_name_after = Document::getFileNameAfter($this->upload_document->extension);
-            if ($request['document_type_id'] !== null) {
-                $document->document_type_id = $request['document_type_id'];
-            }
-            $document->doc_source = Source::LOCAL_FILE;
 
-            $document->save();
-            if ($document->id === null) {
-                throw new Exception('Document was not save!');
+            $documents = [];
+            foreach ($this->uploadDocuments as $upload_document) {
+                $documents[] = $this->uploadDocument($upload_document);
             }
-            $this->upload_document->saveAs('@docs/' . $document->file_name_after);
 
-            return $document;
+            return $documents;
         } else {
+            var_dump($this->errors);
             return false;
         }
+    }
+
+    private function uploadDocument(yii\web\UploadedFile $file)
+    {
+        $request = Yii::$app->request->post();
+        $document = new Document();
+        $document->document_name = $file->baseName;
+        $document->file_name_before = $file->baseName . '.' . $file->extension;
+        $document->file_name_after = Document::getFileNameAfter($file->extension);
+        if ($request['document_type_id'] !== null) {
+            $document->document_type_id = $request['document_type_id'];
+        }
+        $document->doc_source = Source::LOCAL_FILE;
+
+        $document->save();
+        if ($document->id === null) {
+            throw new Exception('Document was not save!');
+        }
+        $file->saveAs('@docs/' . $document->file_name_after);
+
+        return $document;
     }
 }

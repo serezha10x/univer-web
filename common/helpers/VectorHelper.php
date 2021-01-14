@@ -16,7 +16,7 @@ class VectorHelper
         }
     }
 
-    public static function multiplyVectors(array $vector1, array $vector2)
+    public static function multiplyVectors(array $vector1, array $vector2, array $softMatrix = null)
     {
         if (count($vector1) !== count($vector2)) {
             throw new MathException('Cannot multiply vectors with different elements count');
@@ -24,26 +24,36 @@ class VectorHelper
 
         $mult = 0;
         foreach ($vector1 as $word => $value) {
-            $mult += ($vector1[$word] * $vector2[$word]);
+            if ($softMatrix === null) {
+                $mult += ($vector1[$word] * $vector2[$word]);
+            } else {
+                $mult += ($vector1[$word] * $vector2[$word] * $softMatrix[$word][$word]);
+            }
         }
 
         return $mult;
     }
 
-    public static function scalarLengthVectors(array $vector1, array $vector2)
+    public static function scalarLengthVectors(array $vector1, array $vector2, $softMatrix = null)
     {
-        return VectorHelper::scalarVectorValue($vector1) * VectorHelper::scalarVectorValue($vector2);
+        return VectorHelper::scalarVectorValue($vector1, $softMatrix) * VectorHelper::scalarVectorValue($vector2, $softMatrix);
     }
 
-    public static function scalarVectorValue(array $vector)
+    public static function scalarVectorValue(array $vector, $softMatrix = null)
     {
         $sum = 0;
-        foreach ($vector as $point) {
-            $sum += pow($point, 2);
+        if ($softMatrix === null) {
+            foreach ($vector as $point) {
+                $sum += pow($point, 2);
+            }
+        } else {
+            foreach ($vector as $word => $point) {
+                $sum += (pow($point, 2) * $softMatrix[$word][$word]);
+            }
         }
-        if ($sum === 0) {
-            throw new MathException('Division by zero');
-        }
+//        if ($sum === 0) {
+//            throw new MathException('Division by zero');
+//        }
 
         return sqrt($sum);
     }
