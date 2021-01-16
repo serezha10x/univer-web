@@ -57,6 +57,7 @@ class DocumentHandler
         $section = new Vsm();
         $section->formVectorSpaceModel($parser->getResultParser(Property::KEY_WORDS));
         $section->saveVsm($this->document);
+//        $this->document->setSection();
 
         $suitableSections = Section::getSectionsForDocument($this->document);
         foreach ($suitableSections as $name => $section) {
@@ -68,6 +69,10 @@ class DocumentHandler
 
             $documentSection->save();
         }
+
+        $this->document->setSection($this->document->getMostSuitableSection());
+//        var_dump($this->document);die;
+        $this->document->save();
     }
 
     /**

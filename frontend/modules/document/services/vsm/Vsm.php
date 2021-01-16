@@ -34,7 +34,7 @@ class Vsm
 
     private function sortByWeight()
     {
-        asort($this->vsm);
+        arsort($this->vsm);
     }
 
     private function limit(int $limit)

@@ -45,7 +45,6 @@ class UploadDocumentForm extends Model implements IDocumentUpload
 
             return $documents;
         } else {
-            var_dump($this->errors);
             return false;
         }
     }
@@ -64,7 +63,7 @@ class UploadDocumentForm extends Model implements IDocumentUpload
 
         $document->save();
         if ($document->id === null) {
-            throw new Exception('Document was not save!');
+            throw new Exception('Document was ' . $file->baseName . ' not save!');
         }
         $file->saveAs('@docs/' . $document->file_name_after);
 

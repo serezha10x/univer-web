@@ -96,6 +96,7 @@ class DocumentController extends Controller
             ]);
         } else if ($ids !== null) {
             $documents = Document::getDocumentsByIds($ids);
+//            var_dump($documents);die;
             return $this->render('view', [
                 'documents' => $documents,
                 'teachers_by_doc' => DocumentService::getTeacherByDocTeacher($id),
@@ -158,13 +159,16 @@ class DocumentController extends Controller
                     Yii::$app->session->setFlash('uploadDocument', 'Документ успешно загружен');
                     $this->redirect(Url::toRoute(['update', 'id' => $documents[0]->id]));
                 } else {
+                    $ids = '';
                     foreach ($documents as $document) {
                         $handler = new DocumentHandler($document);
                         $handler->textHandle();
+                        $ids .= ('id=' . $document->id . '&');
                     }
+                    $ids = rtrim($ids, '&');
 
                     Yii::$app->session->setFlash('uploadDocument', 'Документы успешно загружены');
-                    $this->redirect(Url::toRoute(['view', 'id' => $documents[0]->id]));
+                    $this->redirect(Url::toRoute(['view', 'ids' => $ids]));
                 }
             }
         }

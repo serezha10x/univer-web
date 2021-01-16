@@ -21,11 +21,10 @@ $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 
+<h1><?= Html::encode($this->title) ?></h1>
+
 <?php foreach($documents as $document) { ?>
     <div class="document-view">
-
-        <h1><?= Html::encode($this->title) ?></h1>
-
         <p>
             <?= Html::a('Редактировать', ['update', 'id' => $document->id], ['class' => 'btn btn-primary']) ?>
             <?= Html::a('Удалить', ['delete', 'id' => $document->id], [
