@@ -1,6 +1,6 @@
 <?php
 
-use frontend\modules\section\models\Section;
+use backend\modules\section\models\Section;
 use yii\db\Migration;
 
 /**

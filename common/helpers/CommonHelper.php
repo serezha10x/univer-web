@@ -40,4 +40,16 @@ class CommonHelper
         return preg_split("@[^A-Za-zА-Яа-я]+@u", $query);
     }
 
+    public static function getVsmFromQuery($query)
+    {
+        $query = CommonHelper::getKeywordsFromQuery($query);
+        $query = array_map('mb_strtoupper', $query);
+        $queryVsm = [];
+
+        foreach ($query as $word) {
+            $queryVsm[$word] = 1;
+        }
+
+        return $queryVsm;
+    }
 }

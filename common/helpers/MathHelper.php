@@ -4,7 +4,7 @@
 namespace common\helpers;
 
 
-use frontend\modules\section\service\TensorHandler;
+use backend\modules\section\service\TensorHandler;
 
 class MathHelper
 {

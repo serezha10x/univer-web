@@ -11,10 +11,26 @@ return [
     'basePath' => dirname(__DIR__),
     'controllerNamespace' => 'backend\controllers',
     'bootstrap' => ['log'],
-    'modules' => [],
+    'modules' => [
+        'teacher' => [
+            'class' => 'backend\modules\teacher\Teacher',
+            //'layout' => 'new',
+        ],
+        'document' => [
+            'class' => 'backend\modules\document\Document',
+            //'layout' => 'new',
+        ],
+        'section' => [
+            'class' => 'backend\modules\section\Section',
+        ],
+        'settings' => [
+            'class' => 'backend\modules\settings\Settings',
+        ],
+    ],
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-backend',
+            'baseUrl' => '/admin',
         ],
         'user' => [
             'identityClass' => 'common\models\User',
@@ -37,14 +53,15 @@ return [
         'errorHandler' => [
             'errorAction' => 'site/error',
         ],
-        /*
         'urlManager' => [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
+                '' => 'site/index',
+                '<controller:\w+>/<action:\w+>/' => '<controller>/<action>',
+                '<module:\w+>/<controller:\w+>/<action:\w+>' => '<module>/<controller>/<action>',
             ],
         ],
-        */
     ],
     'params' => $params,
 ];

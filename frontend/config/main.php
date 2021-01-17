@@ -11,19 +11,19 @@ return [
     'basePath' => dirname(__DIR__),
     'bootstrap' => ['log'],
     'controllerNamespace' => 'frontend\controllers',
-    'modules' => [
-        'teacher' => [
-            'class' => 'frontend\modules\teacher\Teacher',
-            //'layout' => 'new',
-        ],
-        'document' => [
-            'class' => 'frontend\modules\document\Document',
-            //'layout' => 'new',
-        ],
-        'section' => [
-            'class' => 'frontend\modules\section\Section',
-        ],
-    ],
+//    'modules' => [
+//        'teacher' => [
+//            'class' => 'frontend\modules\teacher\Teacher',
+//            //'layout' => 'new',
+//        ],
+//        'document' => [
+//            'class' => 'frontend\modules\document\Document',
+//            //'layout' => 'new',
+//        ],
+//        'section' => [
+//            'class' => 'frontend\modules\section\Section',
+//        ],
+//    ],
     'components' => [
         'request' => [
             'baseUrl' => '',
@@ -54,7 +54,8 @@ return [
             'enablePrettyUrl' => true,
             'showScriptName' => false,
             'rules' => [
-                'article' => 'article/article/index',
+//                '<controller:\w+>/<action:\w+>' => '<controller>/<action>',
+//                '<module:\w+>/<controller:\w+>/<action:\w+>' => '<module>/<controller>/<action>',
             ],
         ],
     ],

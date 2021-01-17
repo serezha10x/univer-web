@@ -1,6 +1,6 @@
 <?php
 
-use frontend\modules\document\models\Property;
+use backend\modules\document\models\Property;
 use yii\db\Migration;
 
 /**

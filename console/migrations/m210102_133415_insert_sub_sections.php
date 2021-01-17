@@ -1,7 +1,7 @@
 <?php
 
-use frontend\modules\section\models\Section;
-use frontend\modules\section\models\SubSection;
+use backend\modules\section\models\Section;
+use backend\modules\section\models\SubSection;
 use yii\db\Migration;
 
 /**
