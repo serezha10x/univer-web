@@ -46,6 +46,30 @@ class PHPQueryParser
         }
     }
 
+    public function parseByItems(string $text, string $mainItem, array $tags)
+    {
+        $result = null;
+        try {
+            $doc = phpQuery::newDocument($text);
+            $items = $doc->find($mainItem);
+            foreach ($items as $item) {
+                $temp = [];
+                foreach ($tags as $tag) {
+                    if ($tag['attr'] === null) {
+                        $temp[$tag['name']] = pq($item)->find($tag['tag'])->text();
+                    } else {
+                        $temp[$tag['name']] = pq($item)->find($tag['tag'])->attr($tag['attr']);
+                    }
+                }
+                $result[] = $temp;
+            }
+
+            return $result;
+        } catch (\Exception $ex) {
+            exit($ex->getMessage());
+        }
+    }
+
 
     public function ParseAssoc(string $text, array $tags): array
     {
@@ -93,10 +117,6 @@ class PHPQueryParser
             \phpQuery::newDocument($html);
 
             $synonyms = pq('div.mw-parser-output')->find('a')->text();
-
-            //$arr_synonyms = preg_split("@\n@u", $synonyms, $limit, PREG_SPLIT_NO_EMPTY);
-
-            //var_dump($arr_synonyms);
 
             \phpQuery::unloadDocuments();
 

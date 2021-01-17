@@ -7,6 +7,7 @@ use yii\db\Migration;
  */
 class m201017_203517_document_section extends Migration
 {
+    /* Пока что делаю что только один раздел у документа */
     /**
      * {@inheritdoc}
      */
@@ -16,6 +17,7 @@ class m201017_203517_document_section extends Migration
             'id' => $this->primaryKey(),
             'document_id' => $this->integer(),
             'section_id' => $this->integer(),
+            'similarity' => $this->float()
         ]);
 
         $this->addForeignKey(

@@ -24,7 +24,16 @@
         "kartik-v/yii2-widget-select2": "@dev",
         "cijic/phpmorphy": "^0.3.1",
         "components/font-awesome": "^5.15",
-        "smalot/pdfparser": "^0.15.1"
+        "smalot/pdfparser": "^0.15.1",
+        "monolog/monolog": "^2.1",
+        "bborrel/google-scholar-profile-parser": "^2.0",
+        "addwiki/wikibase-api": "^0.8.1",
+        "adam-lutka/php-wndb": "^0.3.0",
+        "yooper/php-text-analysis": "^1.5",
+        "kartik-v/yii2-widget-fileinput": "dev-master",
+        "ext-json": "*",
+        "tpmanc/csvhelper": "*",
+        "kartik-v/yii2-widget-switchinput": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

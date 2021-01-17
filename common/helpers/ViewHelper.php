@@ -4,9 +4,6 @@
 namespace common\helpers;
 
 
-use frontend\modules\document\models\DocumentProperty;
-use frontend\modules\document\models\Property;
-
 class ViewHelper
 {
     public static function formDataToDetailView(array $arr)
