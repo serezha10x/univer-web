@@ -1,5 +1,6 @@
 <?php
 
+use common\helpers\ViewHelper;
 use yii\helpers\Html;
 use yii\grid\GridView;
 
@@ -24,7 +25,13 @@ $this->params['breadcrumbs'][] = $this->title;
         'columns' => [
             ['class' => 'yii\grid\SerialColumn'],
             'name',
-            'sections:ntext',
+            [
+                'format' => 'html',
+                'attribute' => 'Ключевые слова раздела',
+                'value' => function ($model) {
+                    return \common\helpers\VectorHelper::getStringFromVector((array)json_decode($model->sections));
+                },
+            ],
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>

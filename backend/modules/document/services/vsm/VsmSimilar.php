@@ -67,7 +67,6 @@ class VsmSimilar
     {
         try {
             $tensorHandler = new TensorHandler($this->section, $this->document->getVsm());
-
             $words = null;
             if ($this->getGeneralWordsType === self::GET_GENERAL_WORDS_BY_SECTIONS) {
                 $words = $this->getGeneralVsmBySections();
@@ -123,7 +122,6 @@ class VsmSimilar
         $generalWords = [];
 
         foreach ($docVsm as $docWord => $docFreq) {
-//            var_dump($docWord);
             if (key_exists($docWord, $sectionVsm)) {
                 $generalWords[] = ['word' => $docWord, 'docFreq' => $docVsm[$docWord], 'sectionFreq' => $sectionVsm[$docWord]];
             } else {

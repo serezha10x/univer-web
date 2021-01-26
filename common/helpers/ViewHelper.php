@@ -13,6 +13,7 @@ class ViewHelper
             $print_str .= ($item->value . ', ');
         }
         $print_str = rtrim($print_str, ', ');
+
         return $print_str;
     }
 }

@@ -25,6 +25,7 @@ use yii\helpers\ArrayHelper;
 use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use yii\web\ServerErrorHttpException;
 use yii\web\UploadedFile;
 
 /**
@@ -140,32 +141,38 @@ class DocumentController extends Controller
     {
         $model = new UploadDocumentForm();
 
-        if (Yii::$app->request->isPost) {
-            $model->uploadDocuments = UploadedFile::getInstances($model, 'uploadDocuments');
-            $documents = $model->upload();
-            // file is uploaded successfully
-            if ($documents !== null) {
-                if (count($documents) === 1) {
-                    $handler = new DocumentHandler($documents[0]);
-                    $handler->textHandle();
-                    $model->saveDocument($documents[0]);
+        try {
+            if (Yii::$app->request->isPost) {
+                $model->uploadDocuments = UploadedFile::getInstances($model, 'uploadDocuments');
+                $documents = $model->upload();
 
-                    Yii::$app->session->setFlash('uploadDocument', 'Документ успешно загружен');
-                    $this->redirect(Url::toRoute(['update', 'id' => $documents[0]->id]));
-                } else {
-                    $ids = '';
-                    foreach ($documents as $document) {
-                        $handler = new DocumentHandler($document);
+                // file is uploaded successfully
+                if ($documents !== null) {
+                    if (count($documents) === 1) {
+                        $handler = new DocumentHandler($documents[0]);
                         $handler->textHandle();
-                        $model->saveDocument($document);
-                        $ids .= ('id=' . $document->id . '&');
-                    }
-                    $ids = rtrim($ids, '&');
+                        $model->saveDocument($documents[0]);
 
-                    Yii::$app->session->setFlash('uploadDocument', 'Документы успешно загружены');
-                    $this->redirect(Url::toRoute(['view', 'ids' => $ids]));
+                        Yii::$app->session->setFlash('uploadDocument', 'Документ успешно загружен');
+                        $this->redirect(Url::toRoute(['update', 'id' => $documents[0]->id]));
+                    } else {
+                        $ids = '';
+                        foreach ($documents as $document) {
+                            $handler = new DocumentHandler($document);
+                            $handler->textHandle();
+                            $model->saveDocument($document);
+                            $ids .= ('id=' . $document->id . '&');
+                        }
+                        $ids = rtrim($ids, '&');
+
+                        Yii::$app->session->setFlash('uploadDocument', 'Документы успешно загружены');
+                        $this->redirect(Url::toRoute(['view', 'ids' => $ids]));
+                    }
                 }
             }
+        } catch (ServerErrorHttpException $ex) {
+            echo $ex->getMessage() . $ex->getTrace();
+            die;
         }
 
         $types = ArrayHelper::map(DocumentType::find()->all(), 'id', 'type');
@@ -190,12 +197,25 @@ class DocumentController extends Controller
             $document->updateProperties($request->post('dates'), Property::getIdByProperty(Property::DATES));
             $document->updateProperties($request->post('fios'), Property::getIdByProperty(Property::FIO));
             $document->updateProperties($request->post('emails'), Property::getIdByProperty(Property::EMAIL));
+            $document->updateProperties($request->post('literature'), Property::getIdByProperty(Property::LITERATURE));
+            $document->updateProperties($request->post('annotation'), Property::getIdByProperty(Property::ANNOTATIONS));
+
             $document->updateTeachers($request->post('teachers'));
             $document->load($request->post());
             $document->document_type_id = $request->post('document_type_id');
-            $document->section_id = $request->post('section_id');
+
+            $type = $request->post('similar_type') ?? false;
+            if ($type) {
+                $document->section_id = $request->post('section_id_soft');
+                $document->getDocumentSection()->setSoftSimilar(false);
+            } else {
+                $document->section_id = $request->post('section_id');
+                $document->getDocumentSection()->setSoftSimilar(true);
+            }
+
             $document->save();
-            $document->getDocumentSection()->setSoftSimilar($request->post('similar_type') ?? false);
+
+            $document->section->addSections($document->getVsm());
 
             return $this->redirect(['view', 'id' => $id]);
         } else {
@@ -209,7 +229,9 @@ class DocumentController extends Controller
                 'fios' => Property::FIO,
                 'emails' => Property::EMAIL,
                 'dates' => Property::DATES,
-                'foundTeachers' => Property::TEACHER
+                'foundTeachers' => Property::TEACHER,
+                'literature' => Property::LITERATURE,
+                'annotation' => Property::ANNOTATIONS,
             ];
 
             $propertiesValue = [];

@@ -29,7 +29,8 @@ class DocumentUploadController extends Controller
             Yii::$app->session->setFlash('uploadDocument', 'Документ успешно загружен');
             $this->redirect(Url::toRoute(['/document/document/update', 'id' => $documentToLoad->id]));
         } catch (\Exception $ex) {
-
+            echo $ex->getMessage();
+            die;
         }
     }
 

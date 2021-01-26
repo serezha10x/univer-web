@@ -5,7 +5,8 @@ namespace backend\modules\section\models;
 use backend\modules\document\models\Document;
 use backend\modules\document\models\DocumentSection;
 use backend\modules\document\services\vsm\VsmSimilar;
-use Yii;
+use backend\modules\settings\models\Settings;
+use JsonException;
 
 /**
  * This is the model class for table "section".
@@ -36,7 +37,7 @@ class Section extends \yii\db\ActiveRecord
             [['name', 'sections'], 'required'],
             [['sections'], 'string'],
             [['name'], 'string', 'max' => 255],
-            [['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => Section::className(), 'targetAttribute' => ['parent_id' => 'id']],        ];
+            [['parent_id'], 'exist', 'skipOnError' => true, 'targetClass' => Section::className(), 'targetAttribute' => ['parent_id' => 'id']],];
     }
 
     /**
@@ -82,7 +83,6 @@ class Section extends \yii\db\ActiveRecord
 //            $parent = $section->parent_id;
 //            $sections = array_merge($sections, json_decode($section->sections, true, 512, JSON_UNESCAPED_UNICODE));
 //        }
-
         return $sections;
     }
 
@@ -94,7 +94,7 @@ class Section extends \yii\db\ActiveRecord
         foreach ($sections as $section) {
             $similar = new VsmSimilar($document, $section);
             $similarSections[$section->name] = ['similarity' => $similar->cosineSimilar(),
-                                                'soft_similarity' => $similar->cosineSoftSimilar()];
+                'soft_similarity' => $similar->cosineSoftSimilar()];
         }
 
         return $similarSections;
@@ -103,5 +103,47 @@ class Section extends \yii\db\ActiveRecord
     public static function getIdByName(string $name)
     {
         return static::findOne(['name' => $name])->id;
+    }
+
+    public function setSection(array $sections)
+    {
+        $this->sections = json_encode($sections, JSON_UNESCAPED_UNICODE);
+        if (json_last_error() !== JSON_ERROR_NONE) {
+            throw new JsonException();
+        }
+    }
+
+    public function addSections(array $docSections)
+    {
+        if (Settings::getSettings("ADD_SECTIONS_BY_DOCS")) {
+            $count = count($this->getVsm());
+            $i = 0;
+            $sections = $this->getVsm();
+            $diff = (int)Settings::getSettings('DIFF_NUM_OF_SECTIONS');
+
+            foreach ($docSections as $word => $freq) {
+                if (self::getCurMinNumSections() + $diff > $count + $i) {
+                    if (!array_key_exists($word, $sections)) {
+                        $sections[$word] = $freq;
+                        ++$i;
+                    }
+                }
+            }
+            if (0 !== $i) {
+                $this->setSection($sections);
+                $this->save();
+            }
+        }
+    }
+
+    public static function getCurMinNumSections()
+    {
+        $nums = [];
+        $sections = Section::find()->all();
+        foreach ($sections as $section) {
+            $nums[] = count($section->getVsm());
+        }
+
+        return min($nums);
     }
 }

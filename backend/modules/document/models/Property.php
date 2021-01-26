@@ -16,13 +16,14 @@ use yii\db\Exception;
 class Property extends \yii\db\ActiveRecord
 {
     const KEY_WORDS = 'Ключевые слова';
+    const THEME = 'Тема';
     const UDK = 'Удк';
     const EMAIL = 'Email';
     const DATES = 'Даты';
     const LITERATURE = 'Литература';
     const FIO = 'ФИО';
     const TEACHER = 'Преподаватели';
-
+    const ANNOTATIONS = 'Аннотации';
 
     /**
      * {@inheritdoc}

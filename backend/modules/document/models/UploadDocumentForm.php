@@ -8,12 +8,13 @@ use backend\modules\document\models\upload\IDocumentUpload;
 use Yii;
 use yii\base\Exception;
 use yii\base\Model;
+use yii\web\ServerErrorHttpException;
 
 
 class UploadDocumentForm extends Model implements IDocumentUpload
 {
-    const MAX_FILE_SIZE_MB = 10;
-    const MAX_FILES = 10;
+    const MAX_FILE_SIZE_MB = 20;
+    const MAX_FILES = 20;
 
     public $document_type_id;
     public $uploadDocuments;
@@ -25,7 +26,7 @@ class UploadDocumentForm extends Model implements IDocumentUpload
             [['document_type_id'], 'integer'],
             [['uploadDocuments'], 'required'],
             [['uploadDocuments'], 'file', 'skipOnEmpty' => false, 'maxSize' => 1024 * 1024 * self::MAX_FILE_SIZE_MB,
-                'extensions' => Yii::$app->getModule('document')->params['allowFormats'], 'maxFiles' => self::MAX_FILES, 'minFiles' => 1],
+                 'maxFiles' => self::MAX_FILES, 'minFiles' => 1],
         ];
     }
 
@@ -45,7 +46,7 @@ class UploadDocumentForm extends Model implements IDocumentUpload
 
             return $documents;
         } else {
-            return false;
+            throw new ServerErrorHttpException($this->errors[0]);
         }
     }
 

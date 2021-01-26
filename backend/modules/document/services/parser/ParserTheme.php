@@ -1,15 +1,16 @@
 <?php
 
 
-namespace App\Parser;
+namespace backend\modules\document\services\parser;
 
 
-final class ParserWordsCase extends ParserBase
+final class ParserTheme extends ParserBase
 {
     protected $text;
+    protected $stopWords = ['УДК'];
 
-
-    public function __construct(&$text) {
+    public function __construct(&$text)
+    {
         parent::__construct($text);
     }
 
@@ -20,10 +21,9 @@ final class ParserWordsCase extends ParserBase
 
         $theme = '';
         $isPrevUpper = false;
-        $isCurUpper = false;
 
         foreach ($tokens as $token) {
-            if ($this->my_ctype_upper($token)) {
+            if ($this->my_ctype_upper($token) AND !$this->isStopWord($token)) {
                 $isCurUpper = true;
                 $theme .= ($token . ' ');
             } else {
@@ -35,18 +35,24 @@ final class ParserWordsCase extends ParserBase
                     continue;
                 }
             }
-            if ($isPrevUpper && $isCurUpper) {
-                $theme .= ($token . ' ');
-            }
             $isPrevUpper = $isCurUpper;
         }
 
-        return 'Тема: ' . $theme;
+        return [trim($theme)];
     }
 
 
-    private function my_ctype_upper(string $str) : bool {
-        if (preg_match('@[а-яё0-9.,;-·:/?!№a-z]@u', $str)) return false;
-        else return true;
+    private function my_ctype_upper(string $str): bool
+    {
+        if (preg_match('@[а-яёa-z]@u', $str)) {
+            return false;
+        } else {
+            return true;
+        }
+    }
+
+    private function isStopWord($word)
+    {
+        return in_array($word, $this->stopWords);
     }
 }

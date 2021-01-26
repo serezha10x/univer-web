@@ -28,7 +28,7 @@ $this->params['breadcrumbs'][] = $this->title;
 
     <p>
         <?= Html::a('Загрузить документ локально', ['upload-local'], ['class' => 'btn btn-success']) ?>
-        <?= Html::a('Загрузить документ с сети', '/document/document-upload/upload-web', ['class' => 'btn btn-warning']) ?>
+        <?= Html::a('Загрузить документ с сети', '/admin/document/document-upload/upload-web', ['class' => 'btn btn-warning']) ?>
         <?= Html::a('Поиск документов', ['search'], ['class' => 'btn btn-info']) ?>
 
     </p>

@@ -7,6 +7,7 @@ use backend\modules\document\models\DocumentSection;
 use backend\modules\document\models\DocumentType;
 use backend\modules\document\models\Property;
 use backend\modules\document\services\parser\Parser;
+use backend\modules\document\services\reader\IReader;
 use backend\modules\document\services\vsm\Vsm;
 use backend\modules\section\models\Section;
 use backend\modules\settings\models\Settings;
@@ -17,9 +18,6 @@ class DocumentHandler
     private $document;
 
     private $handlers;
-    /**
-     * @var array
-     */
 
 
     /**
@@ -50,8 +48,11 @@ class DocumentHandler
 
     public function textHandle()
     {
-        $text = $this->document->read($this->document->file_name_after);
+        $text = $this->document->read($this->document->file_name_after,
+            (int) Settings::getSettings('MAX_PAGES'), (int) Settings::getSettings('READING_TYPE'));
         $text = mb_convert_encoding($text, "UTF-8");
+
+        $startTime = microtime(true);
         $parser = new Parser($text, $this->handlers);
 
         $result = $parser->parse($this->document);
@@ -72,6 +73,7 @@ class DocumentHandler
         }
 
         $this->document->setSection($this->document->getMostSuitableSection());
+        $this->document->tth = (float)microtime(true) - (float)$startTime;
         $this->document->save();
     }
 
