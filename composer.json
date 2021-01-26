@@ -33,7 +33,9 @@
         "kartik-v/yii2-widget-fileinput": "dev-master",
         "ext-json": "*",
         "tpmanc/csvhelper": "*",
-        "kartik-v/yii2-widget-switchinput": "dev-master"
+        "kartik-v/yii2-widget-switchinput": "dev-master",
+        "phpoffice/phpword": "^0.17.0",
+        "lukemadhanga/php-document-parser": "^0.1.5"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

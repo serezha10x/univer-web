@@ -1,10 +1,11 @@
 <?php
 
-use common\helpers\ViewHelper;
 use backend\modules\document\models\DocumentProperty;
 use backend\modules\document\models\DocumentSection;
 use backend\modules\document\models\DocumentType;
 use backend\modules\document\models\Property;
+use backend\modules\document\services\reader\IReader;
+use common\helpers\ViewHelper;
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
@@ -21,9 +22,9 @@ $this->params['breadcrumbs'][] = $this->title;
 \yii\web\YiiAsset::register($this);
 ?>
 
-<h1><?= Html::encode($this->title) ?></h1>
+    <h1><?= Html::encode($this->title) ?></h1>
 
-<?php foreach($documents as $document) { ?>
+<?php foreach ($documents as $document) { ?>
     <div class="document-view">
         <p>
             <?= Html::a('Редактировать', ['update', 'id' => $document->id], ['class' => 'btn btn-primary']) ?>
@@ -34,6 +35,10 @@ $this->params['breadcrumbs'][] = $this->title;
                     'method' => 'post',
                 ],
             ]) ?>
+            <?= "<p>Найдено объектов: " . $document->getNumProperties() . "</p>" ?>
+            <?= "<p>Время обработки: " . $document->tth . "</p>" ?>
+            <?= "<p>Тип обработки: " . IReader::readTypeNames[$document->read_type] . "</p>" ?>
+            <?= "<p>Страницы: " . $document->pages . "</p>" ?>
         </p>
 
         <?= DetailView::widget([
@@ -102,7 +107,24 @@ $this->params['breadcrumbs'][] = $this->title;
                         return ViewHelper::formDataToDetailView($keywords);
                     },
                 ],
-                'doc_source'
+                'doc_source',
+                [
+                    'attribute' => 'Литература',
+                    'value' => function ($data) {
+                        $keywords = DocumentProperty::getValuesByProperty($data->id, Property::LITERATURE);
+//                        var_dump($data->id,($keywords));die;
+                        return ViewHelper::formDataToDetailView($keywords);
+                    },
+                ],
+                'doc_source',
+                [
+                    'attribute' => 'Аннотации',
+                    'value' => function ($data) {
+                        $keywords = DocumentProperty::getValuesByProperty($data->id, Property::ANNOTATIONS);
+                        return ViewHelper::formDataToDetailView($keywords);
+                    },
+                ],
+                'tth'
             ],
         ]) ?>
 

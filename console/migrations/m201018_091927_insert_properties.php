@@ -20,6 +20,8 @@ class m201018_091927_insert_properties extends Migration
         $this->insert('property', ['property' => Property::EMAIL]);
         $this->insert('property', ['property' => Property::DATES]);
         $this->insert('property', ['property' => Property::TEACHER]);
+        $this->insert('property', ['property' => Property::THEME]);
+        $this->insert('property', ['property' => Property::ANNOTATIONS]);
     }
 
     /**

@@ -32,7 +32,7 @@ class DocumentProperty extends \yii\db\ActiveRecord
     {
         return [
             [['document_id', 'property_id'], 'integer'],
-            [['value'], 'string', 'max' => 255],
+            [['value'], 'string'],
             [['document_id'], 'exist', 'skipOnError' => true, 'targetClass' => Document::className(), 'targetAttribute' => ['document_id' => 'id']],
             [['property_id'], 'exist', 'skipOnError' => true, 'targetClass' => Property::className(), 'targetAttribute' => ['property_id' => 'id']],
         ];

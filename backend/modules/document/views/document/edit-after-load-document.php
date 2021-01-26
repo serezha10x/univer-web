@@ -52,7 +52,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php } else { ?>
                 <?= Select2::widget([
                     'name' => 'section_id',
-                    'value' => $sections,
+                    'value' => $document->section_id,
                     'data' => $sections,
                     'maintainOrder' => true,
                     'options' => ['multiple' => false, 'placeholder' => 'Выберите тематический раздел'],
@@ -65,7 +65,7 @@ $this->params['breadcrumbs'][] = $this->title;
             <?php if (isset($document->section_id)) { ?>
                 <?= Select2::widget([
                     'model' => $document,
-                    'name' => 'section_id',
+                    'name' => 'section_id_soft',
                     'value' => $document->section_id,
                     'data' => $softSections,
                     'options' => ['multiple' => false, 'placeholder' => 'Выберите тематический раздел'],
@@ -145,6 +145,28 @@ $this->params['breadcrumbs'][] = $this->title;
                 'data' => $dates,
                 'maintainOrder' => true,
                 'options' => ['multiple' => true, 'placeholder' => 'Даты'],
+            ]); ?>
+        </div>
+
+        <label>Литература:</label>
+        <div class="form-group">
+            <?= Select2::widget([
+                'name' => 'literature[]',
+                'value' => array_keys($literature),
+                'data' => $literature,
+                'maintainOrder' => true,
+                'options' => ['multiple' => true, 'placeholder' => 'Литература'],
+            ]); ?>
+        </div>
+
+        <label>Аннотации:</label>
+        <div class="form-group">
+            <?= Select2::widget([
+                'name' => 'annotation[]',
+                'value' => array_keys($annotation),
+                'data' => $annotation,
+                'maintainOrder' => true,
+                'options' => ['multiple' => true, 'placeholder' => 'Аннотации'],
             ]); ?>
         </div>
 

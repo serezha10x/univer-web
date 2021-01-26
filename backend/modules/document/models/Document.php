@@ -2,6 +2,7 @@
 
 namespace backend\modules\document\models;
 
+use backend\modules\document\services\reader\IReader;
 use backend\modules\document\services\reader\ReaderCreator;
 use backend\modules\document\services\vsm\VsmSimilar;
 use backend\modules\literature\Literature;
@@ -21,6 +22,9 @@ use Yii;
  * @property int|null $year
  * @property string|null $doc_source
  * @property string|null $vsm
+ * @property float $tth
+ * @property int $read_type
+ * @property string $pages
  *
  * @property DocumentType $documentType
  * @property Section $section
@@ -33,6 +37,7 @@ use Yii;
 class Document extends \yii\db\ActiveRecord
 {
     const NUM_CHARS_FILE_NAME = 50;
+
     use DocumentRelation;
 
     /**
@@ -68,7 +73,7 @@ class Document extends \yii\db\ActiveRecord
             [['document_type_id', 'year'], 'integer'],
             [['document_name', 'file_name_before', 'file_name_after', 'description'], 'string', 'max' => 255],
             [['document_type_id'], 'exist', 'skipOnError' => true, 'targetClass' => DocumentType::className(), 'targetAttribute' => ['document_type_id' => 'id']],
-            [['vsm', 'section_id'], 'safe'],
+            [['vsm', 'section_id', 'tth', 'read_type', 'pages'], 'safe'],
         ];
     }
 
@@ -84,14 +89,22 @@ class Document extends \yii\db\ActiveRecord
             'file_name_before' => 'File Name Before',
             'file_name_after' => 'Название файла',
             'doc_source' => 'Источник файла',
+            'tth' => 'Время обработки'
         ];
     }
 
-    public function read(string $filename): string
+    public function read(string $filename, $pages = IReader::DEFAULT_PAGES, $typeReading = IReader::BEGIN_PAGES): string
     {
         $extension = substr($filename, strripos($filename, '.') + 1);
         $reader = ReaderCreator::factory($extension);
-        return $reader->read($filename, Yii::$app->params['docs.path'] . '/tmp');
+        $this->read_type = $typeReading;
+
+        $text = $reader->read($filename, Yii::$app->params['docs.path'] . '/tmp', $pages, $typeReading);
+        if (get_class($reader) === 'backend\modules\document\services\reader\PdfReader') {
+            $this->pages = \common\helpers\ArrayHelper::toString($reader->getPages(), ', ');
+        }
+
+        return $text;
     }
 
     public function addKeyWords(array $keyWords)
@@ -115,7 +128,7 @@ class Document extends \yii\db\ActiveRecord
             $keyword->document_id = $this->id;
             $keyword->property_id = $propertyId;
             $keyword->value = $property;
-            $keyword->save();
+            $saveResult = $keyword->save();
         }
     }
 
@@ -223,5 +236,10 @@ class Document extends \yii\db\ActiveRecord
 
 //var_dump($similarDocuments);die;
         return $similarDocuments;
+    }
+
+    public function getNumProperties()
+    {
+        return $this->getDocumentProperties()->count();
     }
 }

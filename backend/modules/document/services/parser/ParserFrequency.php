@@ -136,7 +136,7 @@ final class ParserFrequency extends ParserBase
             for ($i = 0; $i < $this->num_max; $i++) {
                 if ($value == $maxes[$i]) {
                     $key_word = $this->morphy->lemmatize($key)[0] ?? $key;
-                    $this->key_freq_words[$key] = $value;
+                    $this->key_freq_words[$key_word] = $value;
                     $this->key_words[] = $key_word;
                 }
             }

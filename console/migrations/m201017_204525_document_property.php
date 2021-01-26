@@ -16,7 +16,7 @@ class m201017_204525_document_property extends Migration
             'id' => $this->primaryKey(),
             'document_id' => $this->integer(),
             'property_id' => $this->integer(),
-            'value' => $this->string()
+            'value' => $this->text()
         ]);
 
         $this->addForeignKey(

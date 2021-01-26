@@ -17,6 +17,9 @@ class Parser
         Property::EMAIL => ParserEmails::class,
         Property::DATES => ParserDates::class,
         Property::TEACHER => ParserTeachers::class,
+        Property::THEME => ParserTheme::class,
+        Property::LITERATURE => ParserLiterature::class,
+        Property::ANNOTATIONS => ParserAnnotations::class,
     ];
 
     /**
@@ -78,6 +81,9 @@ class Parser
             Property::EMAIL => ParserEmails::class,
             Property::DATES => ParserDates::class,
             Property::TEACHER => ParserTeachers::class,
+            Property::THEME => ParserTheme::class,
+            Property::LITERATURE => ParserLiterature::class,
+            Property::ANNOTATIONS => ParserAnnotations::class,
         ];
     }
 

@@ -19,8 +19,12 @@ class Vsm
         }
     }
 
+    /* Формируем контекстный вектор */
     public function formVectorSpaceModel(ParserFrequency $freqData)
     {
+        if (!is_array($freqData->getKeyFreqWords())) {
+            return json_encode([]);
+        }
         $this->vsm = [];
         foreach ($freqData->getKeyFreqWords() as $word => $freq) {
             $this->vsm[$word] = $this->calcTermFrequency($freq, $freqData->getCount());
@@ -29,19 +33,22 @@ class Vsm
         $this->sortByWeight();
         $this->limit();
 
-        return json_encode($this->vsm);
+        return json_encode($this->vsm, JSON_UNESCAPED_UNICODE);
     }
 
+    /* Считаем TF */
     private function calcTermFrequency($freq, $count)
     {
         return $freq / $count;
     }
 
+    /* Сортируем по возрастанию */
     private function sortByWeight()
     {
         arsort($this->vsm);
     }
 
+    /* Ограничиваем массив */
     private function limit()
     {
         $count = count($this->vsm);
