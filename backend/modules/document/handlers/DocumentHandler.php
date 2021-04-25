@@ -7,8 +7,8 @@ use backend\modules\document\models\DocumentSection;
 use backend\modules\document\models\DocumentType;
 use backend\modules\document\models\Property;
 use backend\modules\document\services\parser\Parser;
-use backend\modules\document\services\reader\IReader;
 use backend\modules\document\services\vsm\Vsm;
+use backend\modules\document\services\vsm\VsmSimilarity;
 use backend\modules\section\models\Section;
 use backend\modules\settings\models\Settings;
 use common\services\wordnet\WordNetApi;
@@ -17,21 +17,25 @@ class DocumentHandler
 {
     private $document;
 
-    private $handlers;
+    private $parsers;
+    
+    private $vsmSimilarities;
 
 
     /**
      * DocumentHandler constructor.
      * @param Document $document
-     * @param array $handlers
+     * @param array $vsmSimilarities
+     * @param array $parsers
      */
-    public function __construct(Document $document, array $handlers = null)
+    public function __construct(Document $document, array $vsmSimilarities, array $parsers = null)
     {
         $this->document = $document;
-        if ($handlers === null) {
-            $this->handlers = $this->getParsersByDocumentType();
+        $this->vsmSimilarities = $vsmSimilarities;
+        if ($parsers === null) {
+            $this->parsers = $this->getParsersByDocumentType();
         } else {
-            $this->handlers = $handlers;
+            $this->parsers = $parsers;
         }
     }
 
@@ -53,44 +57,76 @@ class DocumentHandler
         $text = mb_convert_encoding($text, "UTF-8");
 
         $startTime = microtime(true);
-        $parser = new Parser($text, $this->handlers);
+        $parser = new Parser($text, $this->parsers);
 
         $result = $parser->parse($this->document);
         $section = new Vsm();
         $this->document->vsm = $section->formVectorSpaceModel($parser->getResultParser(Property::KEY_WORDS));
         $this->document->save();
 
-        $suitableSections = Section::getSectionsForDocument($this->document);
-        foreach ($suitableSections as $name => $section) {
-            $documentSection = new DocumentSection();
-            $documentSection->document_id = $this->document->id;
-            $documentSection->section_id = Section::getIdByName($name);
-            $documentSection->similarity = $section['similarity'];
-            $documentSection->soft_similarity = $section['soft_similarity'];
-            $documentSection->is_soft_similarity_chosen = (bool) Settings::getSettings('SOFT_COSINE_SIMILARITY');
-
-            $documentSection->save();
-        }
+        $suitableSections = $this->vsmHandle($parser);
 
         $this->document->setSection($this->document->getMostSuitableSection());
+        $this->document->method_type = (string) Settings::getSettings('METHOD_TYPE_SAVE');
         $this->document->tth = (float)microtime(true) - (float)$startTime;
         $this->document->save();
+    }
+    
+    private function vsmHandle($parser)
+    {
+        $sections = Section::find()->all();
+        $similarSections = [];
+
+        foreach ($this->vsmSimilarities as $vsmSimilarity) {
+            foreach ($sections as $section) {
+                /* @var $similar VsmSimilarity */
+                $similar = new $vsmSimilarity($this->document, $section, $parser);
+                $similarity = $similar->getSimilarity();
+                $similarSections[$section->name][$similar->getMethodAlias()] = $similarity;
+                $this->saveDocumentSections($section->name, $similarity, $similar->getMethodAlias());
+            }
+        }
+
+        return $similarSections;
+    }
+
+    private function saveDocumentSections($sectionName, $value, $type)
+    {
+//        foreach ($suitableSections as $name => $section) {
+//            foreach ($section as $type => $value) {
+//                $documentSection = new DocumentSection();
+//                $documentSection->document_id = $this->document->id;
+//                $documentSection->section_id = Section::getIdByName($name);
+//                $documentSection->similarity = $value;
+//                $documentSection->method_chosen = $type;
+//
+//                $documentSection->save();
+//            }
+//        }
+
+        $documentSection = new DocumentSection();
+        $documentSection->document_id = $this->document->id;
+        $documentSection->section_id = Section::getIdByName($sectionName);
+        $documentSection->similarity = $value;
+        $documentSection->method_chosen = $type;
+
+        $documentSection->save();
     }
 
     /**
      * @return array
      */
-    public function getHandlers(): array
+    public function getParsers(): array
     {
-        return $this->handlers;
+        return $this->parsers;
     }
 
     /**
-     * @param array $handlers
+     * @param array $parsers
      */
-    public function setHandlers(array $handlers): void
+    public function setParsers(array $parsers): void
     {
-        $this->handlers = $handlers;
+        $this->parsers = $parsers;
     }
 
     private function getSemanticWords(string $word)

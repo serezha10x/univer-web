@@ -14,8 +14,19 @@ final class ParserTheme extends ParserBase
         parent::__construct($text);
     }
 
-
     public function parse()
+    {
+        return [$this->getFirstUpperCaseLine(), $this->getFirstLineAfterUdk()];
+    }
+
+    private function getFirstLineAfterUdk()
+    {
+        preg_match_all("@УДК[\d\.\s\n\r]*(.+?)[A-ZА-Я]@u", $this->text, $matches);
+
+        return trim($matches[1][0]);
+    }
+
+    private function getFirstUpperCaseLine()
     {
         $tokens = tokenize($this->text, \TextAnalysis\Tokenizers\GeneralTokenizer::class);
 
@@ -38,7 +49,7 @@ final class ParserTheme extends ParserBase
             $isPrevUpper = $isCurUpper;
         }
 
-        return [trim($theme)];
+        return trim($theme);
     }
 
 

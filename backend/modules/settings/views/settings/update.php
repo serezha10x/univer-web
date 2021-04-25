@@ -14,6 +14,8 @@ $this->params['breadcrumbs'][] = 'Изменить';
 
     <h1><?= Html::encode($this->title) ?></h1>
 
+    <h3 style="color: red;"><?= $errors['value'] ?></h3>
+
     <?= $this->render('_form', [
         'model' => $model,
     ]) ?>

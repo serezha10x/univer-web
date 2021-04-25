@@ -86,8 +86,25 @@ class SettingsController extends Controller
     {
         $model = $this->findModel($id);
 
-        if ($model->load(Yii::$app->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if ($model->load(Yii::$app->request->post())) {
+            $model->validate();
+            if (empty($model->errors)) {
+                if ($model->key === 'DOC_PATH') {
+                    if (!is_dir($model->value) OR !file_exists($model->value)) {
+                        $errors['value'] = 'Значение неверно';
+
+                        return $this->render('update', [
+                            'model' => $model,
+                            'errors' => $errors
+                        ]);
+                    } else {
+                        $model->value = trim($model->value, '\\/');
+                    }
+                }
+
+                $model->save();
+                return $this->redirect(['view', 'id' => $model->id]);
+            }
         }
 
         return $this->render('update', [

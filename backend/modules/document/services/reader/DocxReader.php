@@ -4,6 +4,8 @@
 namespace backend\modules\document\services\reader;
 
 
+use backend\modules\settings\models\Settings;
+
 class DocxReader implements IReader
 {
     use ReaderByWords;
@@ -32,10 +34,11 @@ class DocxReader implements IReader
 //
         $striped_content = '';
         $content = '';
+
         if ($filepath === null) {
-            $zip = zip_open($_SERVER['DOCUMENT_ROOT'] . "/documents/" . $filename);
+            $zip = zip_open("$filepath/$filename");
         } else {
-            $zip = zip_open($filepath . '/' . $filename);
+            $zip = zip_open("$filepath/$filename");
         }
 
         if (!$zip || is_numeric($zip)) {

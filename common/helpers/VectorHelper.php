@@ -68,4 +68,14 @@ class VectorHelper
 
         return $result;
     }
+
+    public static function getGeoAvg(array $vsm)
+    {
+        $avg = 1;
+        foreach ($vsm as $word) {
+            $avg *= $word['sectionFreq'];
+        }
+
+        return pow($avg, 1 / count($vsm));
+    }
 }

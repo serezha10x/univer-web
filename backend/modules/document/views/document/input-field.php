@@ -11,11 +11,9 @@ use yii\widgets\ActiveForm;
 <div class="document-form">
 
     <?php $form = ActiveForm::begin(); ?>
-    <p>
-        Введите ключевые слова через пробел
-    </p>
+
     <div class="form-group">
-        <?= $form->field($model, 'theme')->label('Поисковый запрос') ?>
+        <?= $form->field($model, 'theme')->label('') ?>
     </div>
 
     <div class="form-group">

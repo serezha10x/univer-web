@@ -35,7 +35,8 @@
         "tpmanc/csvhelper": "*",
         "kartik-v/yii2-widget-switchinput": "dev-master",
         "phpoffice/phpword": "^0.17.0",
-        "lukemadhanga/php-document-parser": "^0.1.5"
+        "lukemadhanga/php-document-parser": "^0.1.5",
+        "kartik-v/yii2-widget-datepicker": "dev-master"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.1.0",

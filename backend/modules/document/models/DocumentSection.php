@@ -12,8 +12,7 @@ use Yii;
  * @property int|null $document_id
  * @property int|null $section_id
  * @property float|null $similarity
- * @property float|null $soft_similarity
- * @property boolean is_soft_similarity_chosen
+ * @property string|null $method_chosen
  *
  * @property Document $document
  * @property Section $section
@@ -38,8 +37,8 @@ class DocumentSection extends \yii\db\ActiveRecord
     {
         return [
             [['document_id', 'section_id'], 'integer'],
-            [['similarity', 'soft_similarity'], 'number'],
-            [['is_soft_similarity_chosen'], 'boolean'],
+            [['similarity'], 'number'],
+            [['method_chosen'], 'string'],
             [['document_id'], 'exist', 'skipOnError' => true, 'targetClass' => Document::className(), 'targetAttribute' => ['document_id' => 'id']],
             [['section_id'], 'exist', 'skipOnError' => true, 'targetClass' => Section::className(), 'targetAttribute' => ['section_id' => 'id']],
         ];
@@ -78,9 +77,9 @@ class DocumentSection extends \yii\db\ActiveRecord
         return $this->hasOne(Section::className(), ['id' => 'section_id']);
     }
 
-    public function setSoftSimilar(bool $isSoftSimilarityChosen)
+    public function setSimilarType(string $type)
     {
-        $this->is_soft_similarity_chosen = $isSoftSimilarityChosen;
+        $this->method_chosen = $type;
         $this->save();
     }
 }

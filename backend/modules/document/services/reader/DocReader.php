@@ -5,12 +5,7 @@ namespace backend\modules\document\services\reader;
 
 
 use backend\modules\document\services\reader\base\Doc;
-use Exception;
-use LukeMadhanga\DocumentParser;
-use PhpOffice\PhpWord\PhpWord;
-use PhpOffice\PhpWord\Element;
-use PhpOffice\PhpWord\Element\Text;
-use PhpOffice\PhpWord\Reader\Word2007;
+use backend\modules\settings\models\Settings;
 
 class DocReader implements IReader
 {

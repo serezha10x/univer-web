@@ -13,8 +13,14 @@ use backend\modules\document\models\Property;
 use backend\modules\document\models\UploadDocumentForm;
 use backend\modules\document\models\UploadWebDocumentForm;
 use backend\modules\document\services\DocumentService;
+use backend\modules\document\services\vsm\AvgSimilarity;
+use backend\modules\document\services\vsm\ContextSimilarity;
+use backend\modules\document\services\vsm\CosineSimilarity;
+use backend\modules\document\services\vsm\SoftCosineSimilarity;
+use backend\modules\document\services\vsm\VsmSimilarity;
 use backend\modules\section\models\Section;
 use backend\modules\section\service\TensorHandler;
+use backend\modules\settings\models\Settings;
 use backend\modules\teacher\models\Teacher;
 use common\helpers\CommonHelper;
 use Yii;
@@ -146,10 +152,20 @@ class DocumentController extends Controller
                 $model->uploadDocuments = UploadedFile::getInstances($model, 'uploadDocuments');
                 $documents = $model->upload();
 
+                $handlers = [
+                    CosineSimilarity::class,
+                    ContextSimilarity::class,
+                    AvgSimilarity::class,
+                ];
+
+                if ((int)Settings::getSettings('SOFT_COSINE_ENABLE')) {
+                    array_splice($handlers, 1, 0, SoftCosineSimilarity::class);
+                }
+
                 // file is uploaded successfully
                 if ($documents !== null) {
                     if (count($documents) === 1) {
-                        $handler = new DocumentHandler($documents[0]);
+                        $handler = new DocumentHandler($documents[0], $handlers);
                         $handler->textHandle();
                         $model->saveDocument($documents[0]);
 
@@ -158,7 +174,7 @@ class DocumentController extends Controller
                     } else {
                         $ids = '';
                         foreach ($documents as $document) {
-                            $handler = new DocumentHandler($document);
+                            $handler = new DocumentHandler($document, $handlers);
                             $handler->textHandle();
                             $model->saveDocument($document);
                             $ids .= ('id=' . $document->id . '&');
@@ -199,19 +215,15 @@ class DocumentController extends Controller
             $document->updateProperties($request->post('emails'), Property::getIdByProperty(Property::EMAIL));
             $document->updateProperties($request->post('literature'), Property::getIdByProperty(Property::LITERATURE));
             $document->updateProperties($request->post('annotation'), Property::getIdByProperty(Property::ANNOTATIONS));
+            $document->updateProperties($request->post('theme'), Property::getIdByProperty(Property::THEME));
 
             $document->updateTeachers($request->post('teachers'));
             $document->load($request->post());
             $document->document_type_id = $request->post('document_type_id');
 
-            $type = $request->post('similar_type') ?? false;
-            if ($type) {
-                $document->section_id = $request->post('section_id_soft');
-                $document->getDocumentSection()->setSoftSimilar(false);
-            } else {
-                $document->section_id = $request->post('section_id');
-                $document->getDocumentSection()->setSoftSimilar(true);
-            }
+            $type = $request->post('methodType');
+            $document->section_id = $request->post(VsmSimilarity::getFieldName($type));
+            $document->getDocumentSection()->setSimilarType($type);
 
             $document->save();
 
@@ -226,6 +238,7 @@ class DocumentController extends Controller
 
             $properties = [
                 'keywords' => Property::KEY_WORDS,
+                'theme' => Property::THEME,
                 'fios' => Property::FIO,
                 'emails' => Property::EMAIL,
                 'dates' => Property::DATES,
@@ -242,12 +255,20 @@ class DocumentController extends Controller
                 ])->all(), 'id', 'value')];
             }
 
+            $methodType = VsmSimilarity::getMethodTypes();
+            if (!((int)Settings::getSettings('SOFT_COSINE_ENABLE'))) {
+                unset($methodType[VsmSimilarity::SOFT_COSINE_TYPE]);
+            }
+
             return $this->render('edit-after-load-document', array_merge([
                 'teachers' => $teachers,
                 'document' => $document,
                 'types' => $types,
-                'sections' => $document->getSectionMap(),
-                'softSections' => $document->getSectionSoftMap(),
+                'cosineSections' => $document->getSectionMap(VsmSimilarity::COSINE_TYPE),
+                'softCosineSections' => $document->getSectionMap(VsmSimilarity::SOFT_COSINE_TYPE),
+                'contextSections' => $document->getSectionMap(VsmSimilarity::CONTEXT_TYPE),
+                'avgSections' => $document->getSectionMap(VsmSimilarity::AVG_TYPE),
+                'methodType' => $methodType
             ], $propertiesValue));
         }
     }
@@ -262,6 +283,13 @@ class DocumentController extends Controller
      * @throws \yii\db\StaleObjectException
      */
     public function actionDelete($id)
+    {
+        $this->delete($id);
+
+        return $this->redirect(['index']);
+    }
+
+    private function delete($id)
     {
         $documentTeacher = DocumentTeacher::find()->where(['document_id' => $id])->all();
         $keywords = Keyword::find()->where(['document_id' => $id])->all();
@@ -282,24 +310,10 @@ class DocumentController extends Controller
         }
 
         $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
     }
 
     public function actionSearch()
     {
-        $tensorHandler = new TensorHandler(Section::findOne(1), 'PHP, JAVA КОМПИЛЯТОР');
-//        $vsm = $tensorHandler->getVsm();
-//        var_dump($vsm);
-//        die;
-
-
-//        $tensor = $t->getT(Section::findOne(1));
-//        $b = $t->additiveConvolution3($tensor);
-//        $a = $t->getQueryVsm('PHP, JAVA КОМПИЛЯТОР');
-//        $t->getQ($b, $a);
-//        $wiki = new WikipediaApi();
-//        echo($wiki->wiktionary('Java'));die;
         $request = Yii::$app->request;
         $uploadForm = new UploadWebDocumentForm();
 
@@ -307,13 +321,9 @@ class DocumentController extends Controller
 
             $userQuery = $uploadForm->theme;
             $userQuery = CommonHelper::getVsmFromQuery($userQuery);
-//            $userQuery = ['PHP' => 1, 'ПРОЦЕСС' => 1, 'СЛУЧАЙ' => 1];
             $section = new Section();
             $section->sections = json_encode($userQuery);
             $suitableDocuments = Document::getSuitableDocuments($section);
-
-//            var_dump($suitableDocuments);
-//            die;
 
             $dataProvider = new ArrayDataProvider ([
                 'allModels' => $suitableDocuments,
@@ -330,5 +340,48 @@ class DocumentController extends Controller
         }
 
         return $this->render('/document-upload/upload-web-form', ['model' => new UploadWebDocumentForm()]);
+    }
+
+    public function actionDeleteAll()
+    {
+        Yii::$app->session->setFlash("delete", "Удалено " . Document::find()->count() . " записей");
+        foreach (Document::find()->all() as $document) {
+            $this->delete($document->id);
+        }
+
+        $searchModel = new DocumentSearch();
+        $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+        return $this->render('index', [
+            'searchModel' => $searchModel,
+            'dataProvider' => $dataProvider,
+        ]);
+    }
+
+    public function actionDeleteByRegex()
+    {
+        $uploadForm = new UploadWebDocumentForm();
+        $request = Yii::$app->request;
+
+        if ($request->isPost && $uploadForm->load(Yii::$app->request->post())) {
+            $documentsToDelete = Document::find()->where(['like', 'document_name', $uploadForm->theme . '%', false])->all();
+            if ($documentsToDelete != null AND count($documentsToDelete) !== 0) {
+                $i = 0;
+                foreach ($documentsToDelete as $documentToDelete) {
+                    $this->delete($documentToDelete->id);
+                    $i++;
+                }
+            }
+            Yii::$app->session->setFlash("delete", "Удалено " . $i . " записей");
+            $searchModel = new DocumentSearch();
+            $dataProvider = $searchModel->search(Yii::$app->request->queryParams);
+
+            return $this->render('index', [
+                'searchModel' => $searchModel,
+                'dataProvider' => $dataProvider,
+            ]);
+        }
+
+        return $this->render('/document/input-field', ['model' => $uploadForm]);
     }
 }

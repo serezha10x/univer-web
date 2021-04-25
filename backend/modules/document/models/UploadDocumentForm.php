@@ -5,6 +5,7 @@ namespace backend\modules\document\models;
 
 
 use backend\modules\document\models\upload\IDocumentUpload;
+use backend\modules\settings\models\Settings;
 use Yii;
 use yii\base\Exception;
 use yii\base\Model;
@@ -66,8 +67,10 @@ class UploadDocumentForm extends Model implements IDocumentUpload
         if ($document->id === null) {
             throw new Exception('Document was ' . $file->baseName . ' not save!');
         }
-
-        $file->saveAs('@docs/tmp/' . $document->file_name_after);
+        if (!file_exists(rtrim(Settings::getSettings('DOC_PATH'), '\\/') . '/tmp/')) {
+            $this->createDir('tmp', rtrim(Settings::getSettings('DOC_PATH'), '\\/'));
+        }
+        $file->saveAs(rtrim(Settings::getSettings('DOC_PATH'), '\\/') . '/tmp/' . $document->file_name_after);
 
         return $document;
     }
@@ -78,13 +81,12 @@ class UploadDocumentForm extends Model implements IDocumentUpload
             if ($uploadDocument->baseName === $document->document_name) {
                 if ($document->section_id !== null) {
                     $this->createDir($document->getSection()->one()->name);
-
-                    return rename(Yii::getAlias('@docs') . '/tmp/' . $document->file_name_after,
-                        Yii::getAlias('@docs') . '/' . $document->getSection()->one()->name . '/' . $document->file_name_after);
+                    return rename(rtrim(Settings::getSettings('DOC_PATH'), '\\/') . '/tmp/' . $document->file_name_after,
+                        rtrim(Settings::getSettings('DOC_PATH'), '\\/') . '/' . $document->getSection()->one()->name . '/' . $document->file_name_after);
                 } else {
                     $this->createDir('Общее');
 
-                    return $uploadDocument->saveAs('@docs/Общее/' . $document->file_name_after);
+                    return $uploadDocument->saveAs(rtrim(Settings::getSettings('DOC_PATH'), '\\/') . '/Общее/' . $document->file_name_after);
                 }
             }
         }
@@ -92,7 +94,7 @@ class UploadDocumentForm extends Model implements IDocumentUpload
 
     public function createDir(string $dir, string $path = null)
     {
-        $path = $path ?? Yii::getAlias('@docs');
+        $path = $path ?? Settings::getSettings('DOC_PATH');
         if (!is_dir("$path/$dir")) {
             mkdir("$path/$dir", 0777, true);
         }

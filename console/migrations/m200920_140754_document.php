@@ -18,6 +18,7 @@ class m200920_140754_document extends Migration
             'file_name_before' => $this->string(),
             'file_name_after' => $this->string(),
             'year' => $this->integer(),
+            'theme' => $this->string()
         ]);
 
 

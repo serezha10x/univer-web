@@ -30,8 +30,16 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('Загрузить документ локально', ['upload-local'], ['class' => 'btn btn-success']) ?>
         <?= Html::a('Загрузить документ с сети', '/admin/document/document-upload/upload-web', ['class' => 'btn btn-warning']) ?>
         <?= Html::a('Поиск документов', ['search'], ['class' => 'btn btn-info']) ?>
-
+        <?= Html::a('Удалить документы по имени', ['delete-by-regex'], ['class' => 'btn btn-danger']) ?>
+        <?= Html::a('Удалить все документы', ['delete-all'], ['class' => 'btn btn-danger']) ?>
     </p>
+
+    <?php if (Yii::$app->session->hasFlash('delete')): ?>
+        <div class="alert alert-danger alert-dismissable">
+            <button aria-hidden="true" data-dismiss="alert" class="close" type="button">×</button>
+            <?= Yii::$app->session->getFlash('delete') ?>
+        </div>
+    <?php endif; ?>
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
 

@@ -67,17 +67,23 @@ $this->params['breadcrumbs'][] = $this->title;
                     },
                 ],
                 [
-                    'attribute' => 'Тип косинуса',
+                    'attribute' => 'Метод обработки при сохранении раздела',
                     'value' => function ($data) {
-                        return $data->getDocumentSection()['is_soft_similarity_chosen'] ?
-                            DocumentSection::SOFT_SIMILARITY_TYPE :
-                            DocumentSection::COMMON_SIMILARITY_TYPE;
+                        /* @var \backend\modules\document\models\Document $data */
+                        return $data->getDocumentSection()->method_chosen;
                     },
                 ],
                 [
                     'format' => 'html',
                     'attribute' => 'Преподаватели',
                     'value' => $teachers_by_doc,
+                ],
+                [
+                    'attribute' => 'Темы',
+                    'value' => function ($data) {
+                        $keywords = DocumentProperty::getValuesByProperty($data->id, Property::THEME);
+                        return ViewHelper::formDataToDetailView($keywords);
+                    },
                 ],
                 [
                     'attribute' => 'Ключевые слова',

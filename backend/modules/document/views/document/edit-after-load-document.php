@@ -28,6 +28,17 @@ $this->params['breadcrumbs'][] = $this->title;
             ?>
         </div>
 
+        <label>Темы</label>
+        <div class="form-group">
+            <?= Select2::widget([
+                'name' => 'theme[]',
+                'value' => array_keys($theme),
+                'data' => $theme,
+                'maintainOrder' => true,
+                'options' => ['multiple' => true, 'placeholder' => 'Ключевые слова']
+            ]); ?>
+        </div>
+
         <label>Тип документа</label>
         <div class="form-group">
             <?= Select2::widget([
@@ -39,60 +50,117 @@ $this->params['breadcrumbs'][] = $this->title;
             ]); ?>
         </div>
 
-        <label>Тематический раздел:</label>
+        <label>Тематический раздел по обычному косинусу:</label>
         <div class="form-group">
             <?php if (isset($document->section_id)) { ?>
                 <?= Select2::widget([
                     'model' => $document,
                     'name' => 'section_id',
                     'value' => $document->section_id,
-                    'data' => $sections,
+                    'data' => $cosineSections,
                     'options' => ['multiple' => false, 'placeholder' => 'Выберите тематический раздел'],
                 ]); ?>
             <?php } else { ?>
                 <?= Select2::widget([
                     'name' => 'section_id',
                     'value' => $document->section_id,
-                    'data' => $sections,
+                    'data' => $cosineSections,
                     'maintainOrder' => true,
                     'options' => ['multiple' => false, 'placeholder' => 'Выберите тематический раздел'],
                 ]); ?>
             <?php } ?>
         </div>
 
-        <label>Тематический раздел по мягкому косинусу:</label>
-        <div class="form-group">
-            <?php if (isset($document->section_id)) { ?>
-                <?= Select2::widget([
+        <?php
+        if ((int) \backend\modules\settings\models\Settings::getSettings('SOFT_COSINE_ENABLE')) {
+            echo "<label>Тематический раздел по мягкому косинусу:</label>";
+            echo '<div class="form-group">';
+            if (isset($document->section_id)) {
+                echo Select2::widget([
                     'model' => $document,
                     'name' => 'section_id_soft',
                     'value' => $document->section_id,
-                    'data' => $softSections,
+                    'data' => $softCosineSections,
+                    'options' => ['multiple' => false, 'placeholder' => 'Выберите тематический раздел'],
+                ]);
+            } else {
+                echo Select2::widget([
+                    'name' => 'section_id_soft',
+                    'value' => $document->section_id,
+                    'data' => $softCosineSections,
+                    'maintainOrder' => true,
+                    'options' => ['multiple' => false, 'placeholder' => 'Выберите тематический раздел'],
+                ]);
+            }
+            echo '</div>';
+        }
+    ?>
+
+        <label>Тематический раздел по контекстному методу:</label>
+        <div class="form-group">
+            <?php if (isset($document->section_id)) { ?>
+                <?= Select2::widget([
+                    'model' => $document,
+                    'name' => 'section_id_context',
+                    'value' => $document->section_id,
+                    'data' => $contextSections,
                     'options' => ['multiple' => false, 'placeholder' => 'Выберите тематический раздел'],
                 ]); ?>
             <?php } else { ?>
                 <?= Select2::widget([
-                    'name' => 'section_id',
-                    'value' => $softSections,
-                    'data' => $softSections,
+                    'name' => 'section_id_context',
+                    'value' => $document->section_id,
+                    'data' => $contextSections,
                     'maintainOrder' => true,
                     'options' => ['multiple' => false, 'placeholder' => 'Выберите тематический раздел'],
                 ]); ?>
             <?php } ?>
         </div>
+
+        <label>Тематический раздел по среднему взвешенному методу:</label>
+        <div class="form-group">
+            <?php if (isset($document->section_id)) { ?>
+                <?= Select2::widget([
+                    'model' => $document,
+                    'name' => 'section_id_avg',
+                    'value' => $document->section_id,
+                    'data' => $avgSections,
+                    'options' => ['multiple' => false, 'placeholder' => 'Выберите тематический раздел'],
+                ]); ?>
+            <?php } else { ?>
+                <?= Select2::widget([
+                    'name' => 'section_id_avg',
+                    'value' => $document->section_id,
+                    'data' => $avgSections,
+                    'maintainOrder' => true,
+                    'options' => ['multiple' => false, 'placeholder' => 'Выберите тематический раздел'],
+                ]); ?>
+            <?php } ?>
+        </div>
+
+        <label>Метод обработки при сохранении раздела:</label>
+        <div class="form-group">
+            <?= Select2::widget([
+                'value' => 'cosine',
+                'name' => 'methodType',
+                'data' => $methodType,
+                'options' => ['multiple' => false, 'placeholder' => 'Выберите тематический раздел'],
+            ]); ?>
+        </div>
+
         <?php
 
-        echo SwitchInput::widget([
-            'name' => 'similar_type',
-            'value' => (bool) $document->getDocumentSection()->is_soft_similarity_chosen,
-            'indeterminateValue' => true,
-            'pluginOptions' => [
-                'handleWidth' => 160,
-                'onText' => 'Мягкий косинус',
-                'offText' => 'Обычный косинус',
-            ]
-        ]);
-        ?>
+//        echo SwitchInput::widget([
+//            'name' => 'similar_type',
+//            'value' => (bool) $document->getDocumentSection()->is_soft_similarity_chosen,
+//            'indeterminateValue' => true,
+//            'pluginOptions' => [
+//                'handleWidth' => 160,
+//                'onText' => 'Мягкий косинус',
+//                'offText' => 'Обычный косинус',
+//            ]
+//        ]);
+//        ?>
 
         <label>Преподаватели</label>
         <div class="form-group">

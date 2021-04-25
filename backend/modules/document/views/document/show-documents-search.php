@@ -30,22 +30,22 @@ use yii\helpers\Html;
             ['class' => 'yii\grid\SerialColumn'],
             [
                 'attribute' => 'Название документа',
-                'value' => function ($data) {
-                    return $data['doc']->document_name;
+                'value' => function ($data, $key) {
+                    return $key;
                 },
             ],
             [
                 'attribute' => 'Обычный косинус',
                 'value' => function ($data) {
-                    return $data['similarity'];
+                    return $data;
                 },
             ],
-            [
-                'attribute' => 'Мягкий косинус',
-                'value' => function ($data) {
-                    return $data['soft_similarity'];
-                },
-            ],
+//            [
+//                'attribute' => 'Мягкий косинус',
+//                'value' => function ($data) {
+//                    return $data['soft_similarity'];
+//                },
+//            ],
         ]
     ]); ?>
 

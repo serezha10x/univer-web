@@ -16,6 +16,7 @@ final class ParserFrequency extends ParserBase
     private $count;
     private $morphy;
     private $num_max = 5;
+    private $arr_freq;
 
     public function __construct(&$text)
     {
@@ -40,6 +41,16 @@ final class ParserFrequency extends ParserBase
         return $this->count;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getArrFreq()
+    {
+        return $this->arr_freq;
+    }
+
+
+
     public function parse()
     {
         try {
@@ -50,7 +61,7 @@ final class ParserFrequency extends ParserBase
             die('Error occured while creating phpMorphy instance: ' . $e->getMessage());
         }
 
-        $arr_words = $this->tokenize($this->text);
+        $this->tokens = $arr_words = $this->tokenize($this->text);
 
         $this->count = $count = count($arr_words);
         // получаем части речи, необходимые для парсинга
@@ -121,13 +132,17 @@ final class ParserFrequency extends ParserBase
                             unset($arr_words[$i]);
                         }
                     } else {
-                        unset($arr_words[$i]);
+//                        unset($arr_words[$i]);
                     }
                 }
             }
         }
 
         $arr_freq = array_count_values($arr_words);
+
+        $this->arr_freq = array_map(function ($item) {
+            return $item / $this->count;
+        }, $arr_freq);
 
         $maxes = $this->getMaxes($arr_freq, $this->num_max);
         $temp_array = array();

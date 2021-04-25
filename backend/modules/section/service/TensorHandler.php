@@ -4,6 +4,7 @@
 namespace backend\modules\section\service;
 
 
+use backend\modules\document\services\vsm\CosineSimilarity;
 use common\helpers\CommonHelper;
 use common\helpers\MathHelper;
 use backend\modules\document\models\Document;
@@ -51,6 +52,7 @@ class TensorHandler
     public function getAdditiveConvolutionCube()
     {
         $thematicTensor = $this->getThematicTensor();
+//        var_dump($thematicTensor);die;
         return MathHelper::additiveConvolutionCube($thematicTensor);
     }
 
@@ -64,13 +66,12 @@ class TensorHandler
                 foreach (self::RELATIONS as $relation) {
                     $doc = new Document();
                     $doc->setVsm([$word2 => $freq2]);
-                    $vsmSimilar = new VsmSimilar($doc, $this->section);
-                    $thematicTensor[$word1][$word2][$relation] = $vsmSimilar->cosineSimilar();
+                    $vsmSimilar = new CosineSimilarity($doc, $this->section);
+                    $thematicTensor[$word1][$word2][$relation] = $vsmSimilar->getSimilarity();
                 }
             }
         }
 
-//        var_dump($thematicTensor);die;
         return $thematicTensor;
     }
 
