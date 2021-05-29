@@ -9,7 +9,7 @@ use yii\widgets\ActiveForm;
 /* @var $this yii\web\View */
 /* @var $model backend\modules\document\models\Document */
 
-$this->title = 'Редактиовать документ';
+$this->title = 'Редактировать документ';
 $this->params['breadcrumbs'][] = ['label' => 'Документ', 'url' => ['index']];
 $this->params['breadcrumbs'][] = $this->title;
 ?>

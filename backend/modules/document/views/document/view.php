@@ -66,13 +66,13 @@ $this->params['breadcrumbs'][] = $this->title;
                         return \common\helpers\VectorHelper::getStringFromVector($data->getVsm());
                     },
                 ],
-                [
-                    'attribute' => 'Метод обработки при сохранении раздела',
-                    'value' => function ($data) {
-                        /* @var \backend\modules\document\models\Document $data */
-                        return $data->getDocumentSection()->method_chosen;
-                    },
-                ],
+//                [
+//                    'attribute' => 'Метод обработки при сохранении раздела',
+//                    'value' => function ($data) {
+//                        /* @var \backend\modules\document\models\Document $data */
+//                        return $data->getDocumentSection()->method_chosen;
+//                    },
+//                ],
                 [
                     'format' => 'html',
                     'attribute' => 'Преподаватели',

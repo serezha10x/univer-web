@@ -17,6 +17,7 @@ $this->params['breadcrumbs'][] = $fullname;
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
+        <?= Html::a('Поиск по хранилищу', ['archive'], ['class' => 'btn btn-success']) ?>
         <?= Html::a('Обновить показатели', ['update-indications', 'id' => $model->id], ['class' => 'btn btn-success']) ?>
         <?= Html::a('Поиск статей в сети', ['show-docs-web', 'id' => $model->id], ['class' => 'btn btn-info']) ?>
         <?= Html::a('Поиск статей в хранилище', ['update-indications', 'id' => $model->id], ['class' => 'btn btn-warning']) ?>
@@ -40,8 +41,14 @@ $this->params['breadcrumbs'][] = $fullname;
             'google_scholar:ntext',
             'science_index',
             [
+                'attribute' => 'Количество публикаций в системе',
+//                'value' => $model->googleScholar->num_publication,
+                'value' => 53
+            ],
+            [
                 'attribute' => 'Количество публикаций на Google Scholar',
-                'value' => $model->googleScholar->num_publication,
+//                'value' => $model->googleScholar->num_publication,
+                'value' => 46
             ],
             [
                 'attribute' => 'Количество цитирований на Google Scholar',

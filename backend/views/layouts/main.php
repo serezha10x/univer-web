@@ -40,6 +40,7 @@ AppAsset::register($this);
         ['label' => 'Преподаватели', 'url' => ['/teacher/teacher/index']],
         ['label' => 'Документы', 'url' => ['/document/document/index']],
         ['label' => 'Разделы', 'url' => ['/section/section/index']],
+//        ['label' => 'Архив', 'url' => ['/archive/archive/index']],
         ['label' => 'Настройки', 'url' => ['/settings/settings/index']],
 
     ];

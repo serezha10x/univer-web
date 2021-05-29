@@ -3,6 +3,7 @@
 namespace backend\modules\document\controllers;
 
 use backend\modules\document\handlers\DocumentHandler;
+use backend\modules\document\models\AdvancedSearch;
 use backend\modules\document\models\Document;
 use backend\modules\document\models\DocumentProperty;
 use backend\modules\document\models\DocumentSearch;
@@ -19,7 +20,6 @@ use backend\modules\document\services\vsm\CosineSimilarity;
 use backend\modules\document\services\vsm\SoftCosineSimilarity;
 use backend\modules\document\services\vsm\VsmSimilarity;
 use backend\modules\section\models\Section;
-use backend\modules\section\service\TensorHandler;
 use backend\modules\settings\models\Settings;
 use backend\modules\teacher\models\Teacher;
 use common\helpers\CommonHelper;
@@ -54,7 +54,7 @@ class DocumentController extends Controller
             ],
             'access' => [
                 'class' => AccessControl::className(),
-//                'only' => ['index', 'create', 'update', 'delete', 'update-indications'],
+                'only' => ['index', 'create', 'update', 'delete', 'update-indications'],
                 'rules' => [
                     [
                         'allow' => true,
@@ -80,6 +80,19 @@ class DocumentController extends Controller
         ]);
     }
 
+    public function actionAdvancedSearch()
+    {
+        $model = new AdvancedSearch();
+        $types = [
+            'Учебно-методическое издание',
+            'Научная статья'
+        ];
+        return $this->render('advanced-search', [
+            'model' => $model,
+            'types' => $types,
+        ]);
+    }
+
     /**
      * Displays a single Document model.
      * @param integer $id
@@ -96,13 +109,11 @@ class DocumentController extends Controller
             ]);
         } else if ($ids !== null) {
             $documents = Document::getDocumentsByIds($ids);
-//            var_dump($documents);die;
             return $this->render('view', [
                 'documents' => $documents,
                 'teachers_by_doc' => DocumentService::getTeacherByDocTeacher($id),
             ]);
         }
-
     }
 
     /**
@@ -223,7 +234,9 @@ class DocumentController extends Controller
 
             $type = $request->post('methodType');
             $document->section_id = $request->post(VsmSimilarity::getFieldName($type));
-            $document->getDocumentSection()->setSimilarType($type);
+            if ($document->getDocumentSection() != null) {
+                $document->getDocumentSection()->setSimilarType($type);
+            }
 
             $document->save();
 

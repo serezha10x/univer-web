@@ -29,8 +29,6 @@ $this->params['breadcrumbs'][] = $this->title;
         <?= Html::a('Добавить преподавателя', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
-    <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
-
     <?= GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
@@ -40,14 +38,6 @@ $this->params['breadcrumbs'][] = $this->title;
             'fathername',
             'surname',
             'position:ntext',
-            //'google_scholar:ntext',
-            //'google_scholar_id',
-            //'science_index:ntext',
-            //'science_index_id',
-            //'spin_code:ntext',
-            //'sciverse_scopus:ntext',
-            //'sciverse_scopus_id',
-            //'scopus_author_id:ntext',
             ['class' => 'yii\grid\ActionColumn'],
         ],
     ]); ?>

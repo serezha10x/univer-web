@@ -2,20 +2,17 @@
 
 namespace backend\modules\teacher\controllers;
 
-use common\exceptions\NotFoundTeacherException;
+use backend\modules\document\services\DocumentService;
 use backend\modules\document\services\finder\GoogleScholarPublications;
-use backend\modules\teacher\models\TeacherIndicator;
-use backend\modules\teacher\services\DocsFinderWeb;
-use Yii;
 use backend\modules\teacher\models\Teacher;
 use backend\modules\teacher\models\TeacherSearch;
-use yii\data\ActiveDataProvider;
+use common\exceptions\NotFoundTeacherException;
+use Yii;
 use yii\data\ArrayDataProvider;
 use yii\filters\AccessControl;
+use yii\filters\VerbFilter;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
-use yii\filters\VerbFilter;
-use function DI\value;
 
 /**
  * TeacherController implements the CRUD actions for Teacher model.
@@ -64,6 +61,48 @@ class TeacherController extends Controller
         ]);
     }
 
+    public function actionArchive()
+    {
+        $archieve =
+            ['Преподаватели' => [
+                'Андриевская' => [
+                    'Личная',
+                    'Статьи' => [
+                        'ИУСКМ' => [
+                            'ИУС' => [
+                                'Контейниризация в микросервисах',
+                                'Иерархические СУБД',
+                                'Онтологический подход в поиске'
+                            ]
+                        ]
+                    ],
+                    'Кафедра' => [],
+                    'Дисциплины' => [
+                        'ОБДЗ' => [
+                            'Документация',
+                            'Методички',
+                            'Лекции',
+                            'Материалы',
+                            'Работы' => [
+                                'ВКР',
+                                'КР+КП',
+                                'Лб'
+                            ]
+                        ],
+                        'СУБД' => [
+
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $docService = new DocumentService();
+        $outputArchieve = $docService->tree($archieve);
+
+        return $this->render('archive', ['archive' => $outputArchieve]);
+    }
+
     /**
      * Displays a single Teacher model.
      * @param integer $id
@@ -75,6 +114,22 @@ class TeacherController extends Controller
         return $this->render('view', [
             'model' => $this->findModel($id),
         ]);
+    }
+
+    /**
+     * Finds the Teacher model based on its primary key value.
+     * If the model is not found, a 404 HTTP exception will be thrown.
+     * @param integer $id
+     * @return Teacher the loaded model
+     * @throws NotFoundHttpException if the model cannot be found
+     */
+    protected function findModel($id)
+    {
+        if (($model = Teacher::findOne($id)) !== null) {
+            return $model;
+        }
+
+        throw new NotFoundHttpException('The requested page does not exist.');
     }
 
     /**
@@ -131,22 +186,6 @@ class TeacherController extends Controller
         return $this->redirect(['index']);
     }
 
-    /**
-     * Finds the Teacher model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param integer $id
-     * @return Teacher the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = Teacher::findOne($id)) !== null) {
-            return $model;
-        }
-
-        throw new NotFoundHttpException('The requested page does not exist.');
-    }
-
     public function actionUpdateIndications($id)
     {
         $model = $this->findModel($id);
@@ -166,32 +205,6 @@ class TeacherController extends Controller
             'model' => $model
         ]);
     }
-//
-//    public function actionShowDocsWeb($id)
-//    {
-//        if (!Teacher::isIssetTeacher($id)) {
-//            throw new NotFoundTeacherException();
-//        }
-//        $teacher = Teacher::findOne(['id' => $id]);
-//
-//        $docsFinder = new DocsFinderWeb();
-//        $docs = $docsFinder->getDocs($teacher);
-//
-////        echo '<pre>';var_dump($docs); exit();
-//        $dataProvider = new ArrayDataProvider ([
-//            'allModels' => $docs,
-////            'pagination' => [
-////                'pageSize' => 20,
-////            ],
-//        ]);
-//
-//        return $this->render('show-docs', [
-//            'dataProvider' => $dataProvider,
-//            'docs' => $docs,
-//            'teacher' => $teacher
-//        ]);
-//    }
-
 
     public function actionShowDocsWeb($id)
     {
@@ -218,5 +231,4 @@ class TeacherController extends Controller
             'teacher' => $teacher
         ]);
     }
-
 }

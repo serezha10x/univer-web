@@ -26,6 +26,9 @@ return [
         'settings' => [
             'class' => 'backend\modules\settings\Settings',
         ],
+        'archive' => [
+            'class' => 'backend\modules\archive\Archive',
+        ],
     ],
     'components' => [
         'request' => [
